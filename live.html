@@ -1,0 +1,741 @@
+<title>Jira Live · Consumo de Horas por Proyecto — JTC</title>
+<style>
+:root {
+  --jtc-navy:#11273C;--jtc-blue:#0278D2;--jtc-org:#FC5E32;--jtc-yel:#FFED00;
+  --bg:#EEF3F9;--sf:#FFFFFF;--sf2:#F5F8FC;--bd:#C8D4E0;
+  --ac:#0278D2;--ac-s:#DCF0FF;
+  --t1:#11273C;--t2:#3D5568;--t3:#7A90A4;
+  --sh:0 1px 4px rgba(17,39,60,.08);--r:10px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;
+  --ac:#2E90E0;--ac-s:#0F2040;--t1:#E0EAF6;--t2:#8095B0;--t3:#506070;
+  --sh:0 1px 4px rgba(0,0,0,.35);
+}}
+:root[data-theme=light]{--bg:#EEF3F9;--sf:#FFF;--sf2:#F5F8FC;--bd:#C8D4E0;--ac:#0278D2;--ac-s:#DCF0FF;--t1:#11273C;--t2:#3D5568;--t3:#7A90A4;--sh:0 1px 4px rgba(17,39,60,.08);}
+:root[data-theme=dark]{--bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;--ac:#2E90E0;--ac-s:#0F2040;--t1:#E0EAF6;--t2:#8095B0;--t3:#506070;--sh:0 1px 4px rgba(0,0,0,.35);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'Rubik','Ubuntu','Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5}
+
+.brand-hdr{background:var(--jtc-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand-logo{display:flex;align-items:baseline;gap:8px}
+.brand-jtc{color:#FFF;font-size:22px;font-weight:800;letter-spacing:.08em}
+.brand-tag{color:rgba(255,255,255,.55);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em}
+.brand-title{color:rgba(255,255,255,.9);font-size:14px;font-weight:500;border-left:1px solid rgba(255,255,255,.2);padding-left:16px}
+.brand-sub{color:rgba(255,255,255,.45);font-size:11px;margin-top:2px}
+.period-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,237,0,.15);border:1px solid rgba(255,237,0,.4);border-radius:6px;padding:3px 10px;font-size:11px;color:#FFED00;font-weight:600;margin-left:10px}
+.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;white-space:nowrap;font-family:inherit}
+.theme-btn:hover{color:#fff;background:rgba(255,255,255,.18)}
+
+.wrap{max-width:1100px;margin:0 auto;padding:18px 18px 30px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:18px 20px}
+.sect-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:12px}
+
+.search-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:16px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search-input{flex:1;min-width:220px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:9px 14px;font-size:14px;color:var(--t1);font-family:'Courier New',monospace;font-weight:700;letter-spacing:.03em;outline:none}
+.search-input:focus{border-color:var(--ac)}
+.search-input::placeholder{font-family:inherit;font-weight:400;color:var(--t3)}
+.search-btn{background:var(--jtc-blue);border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap}
+.search-btn:hover{background:#0263AD}
+.search-btn:disabled{opacity:.6;cursor:default}
+.search-status{font-size:12px;color:var(--t3);flex-basis:100%}
+.search-status.err{color:#D94520;font-weight:600}
+.search-status.ok{color:#1A9A5A;font-weight:600}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:580px){.kpi-grid{grid-template-columns:1fr 1fr}}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:16px 18px}
+.kpi-n{font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;color:var(--jtc-blue)}
+.kpi-n.dim{font-size:26px;color:var(--t1)}
+.kpi-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-top:5px}
+.kpi-sub{font-size:11px;color:var(--t3);margin-top:3px}
+.kpi-accent{border-top:3px solid var(--jtc-blue)}
+.kpi-period{border-top:3px solid var(--jtc-org)}
+
+.st-row{display:flex;flex-wrap:wrap;gap:8px}
+.st-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:8px;border:1px solid transparent}
+.st-chip .ct{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.st-chip .lb{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;opacity:.85}
+
+.filter-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:14px 20px;display:flex;flex-direction:column;gap:14px}
+.filter-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.f-section{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.f-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)}
+.fpills{display:flex;flex-wrap:wrap;gap:5px}
+.fpill{background:var(--sf2);border:1px solid var(--bd);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
+.fpill:hover{border-color:var(--ac);color:var(--ac)}
+.fpill.active{background:var(--ac-s);border-color:var(--ac);color:var(--ac)}
+.fpill.active.st-pill{background:var(--st-bg,var(--ac-s));border-color:var(--st-fg,var(--ac));color:var(--st-fg,var(--ac))}
+.fpill.active.ta-pill{background:var(--ta-bg,var(--ac-s));border-color:var(--ta-fg,var(--ac));color:var(--ta-fg,var(--ac))}
+.f-select{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--t1);font-family:inherit;min-width:180px;max-width:260px;cursor:pointer;outline:none}
+.f-select:focus{border-color:var(--ac)}
+.f-input{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--t1);font-family:inherit;width:136px;cursor:pointer;outline:none}
+.f-input:focus{border-color:var(--ac)}
+.f-input.active-date{border-color:var(--jtc-org);background:rgba(252,94,50,.06)}
+.date-pair{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.date-sep{font-size:11px;color:var(--t3)}
+.f-right{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;align-items:flex-end;flex-shrink:0}
+.clear-btn{background:var(--jtc-org);border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;display:none;font-family:inherit;white-space:nowrap}
+.clear-btn:hover{background:#D94520}
+.match-info{font-size:11px;color:var(--t3);text-align:right;white-space:nowrap}
+.match-highlight{font-weight:700;color:var(--jtc-org)}
+.period-note{font-size:10px;color:var(--jtc-org);font-weight:600;text-align:right;white-space:nowrap}
+
+.sort-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between}
+.sort-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sort-lbl{font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.sort-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:inherit}
+.sort-btn.active{background:var(--ac-s);border-color:var(--ac);color:var(--ac);font-weight:600}
+.sort-btn:hover:not(.active){color:var(--t1)}
+.tbl-count{font-size:11px;color:var(--t3)}
+
+.tbl-wrap{overflow-x:auto}
+.trow{display:grid;grid-template-columns:82px 1fr 148px 88px 78px 90px 34px 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.trow:last-child{border-bottom:none}
+.thd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:4px 0 6px}
+@media(max-width:760px){.trow{grid-template-columns:78px 1fr 140px 65px 30px 28px}.t-hide{display:none}}
+.t-key{font-family:'Courier New','Consolas',monospace;font-weight:700;font-size:11px;color:var(--ac)}
+.t-key a{color:inherit;text-decoration:none}
+.t-key a:hover{text-decoration:underline}
+.t-summ{color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-h{font-weight:700;font-variant-numeric:tabular-nums;color:var(--t1)}
+.t-h.period-h{color:var(--jtc-org)}
+.t-zero{color:var(--t3)}
+.t-vc{font-variant-numeric:tabular-nums;color:var(--t2);text-align:center}
+.mini-track{height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
+.mini-fill{height:100%;border-radius:3px;width:0;transition:width .9s cubic-bezier(.4,0,.2,1) .08s}
+.tog-btn{background:none;border:1px solid var(--bd);border-radius:5px;width:25px;height:22px;cursor:pointer;color:var(--t3);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
+.tog-btn:hover{color:var(--t1);border-color:var(--t2)}
+.tog-btn.open{background:var(--ac-s);border-color:var(--ac);color:var(--ac)}
+
+.ta-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
+
+.exp-row{padding:12px 4px 16px 82px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.exp-meta{font-size:11px;color:var(--t3);margin-bottom:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.exp-grid{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:start}
+.exp-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:8px}
+.cons-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.cons-name{width:168px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.cons-bar{flex:1;height:6px;background:var(--sf);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
+.cons-fill{height:100%;border-radius:3px}
+.cons-h{width:40px;font-variant-numeric:tabular-nums;font-weight:700;font-size:11px;color:var(--t2);text-align:right;flex-shrink:0}
+.st-counts{display:flex;flex-direction:column;gap:5px;min-width:140px}
+.stc-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)}
+.stc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.stc-n{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700;color:var(--t1)}
+
+.spill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.spill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+.rc-item{display:grid;grid-template-columns:168px 1fr 50px;gap:10px;align-items:center;margin-bottom:10px;font-size:12px}
+.rc-item:last-child{margin-bottom:0}
+.rc-name{color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-track{height:8px;background:var(--sf2);border-radius:4px;overflow:hidden;border:1px solid var(--bd)}
+.rc-fill{height:100%;border-radius:4px;width:0;transition:width .9s cubic-bezier(.4,0,.2,1) .15s}
+.rc-rank-1 .rc-fill{background:var(--jtc-blue)}
+.rc-rank-2 .rc-fill{background:var(--jtc-org)}
+.rc-h{font-weight:700;font-variant-numeric:tabular-nums;color:var(--t2);text-align:right}
+
+.empty-state{padding:32px;text-align:center;color:var(--t3);font-size:14px}
+.empty-state strong{display:block;font-size:18px;margin-bottom:6px;color:var(--t2)}
+</style>
+
+<!-- BRAND HEADER -->
+<div class="brand-hdr">
+  <div class="brand-logo">
+    <span class="brand-jtc">JTC</span>
+    <span class="brand-tag">just time consulting group</span>
+  </div>
+  <div class="brand-title">
+    Jira Live · Consumo de Horas
+    <div class="brand-sub">Consulta cualquier proyecto en tiempo real</div>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()">◑ Tema</button>
+</div>
+
+<div class="wrap">
+
+  <!-- SEARCH -->
+  <div class="search-card">
+    <input class="search-input" id="project-input" placeholder="Clave de proyecto, ej. ATIHD" autocomplete="off" spellcheck="false">
+    <button class="search-btn" id="search-btn" onclick="runSearch()">Buscar</button>
+    <div class="search-status" id="search-status"></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi kpi-accent">
+      <div class="kpi-n" id="kpi-casos">—</div>
+      <div class="kpi-l">Casos</div>
+      <div class="kpi-sub" id="kpi-casos-sub">busca un proyecto</div>
+    </div>
+    <div class="kpi" id="kpi-h-card">
+      <div class="kpi-n" id="kpi-h">—</div>
+      <div class="kpi-l" id="kpi-h-label">Horas consumidas</div>
+      <div class="kpi-sub" id="kpi-h-sub">en issues vinculadas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n dim" id="kpi-act">—</div>
+      <div class="kpi-l">Con actividad</div>
+      <div class="kpi-sub" id="kpi-act-sub">casos con horas registradas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n dim" id="kpi-c">—</div>
+      <div class="kpi-l">Consultores</div>
+      <div class="kpi-sub" id="kpi-c-sub">con horas registradas</div>
+    </div>
+  </div>
+
+  <!-- STATUS DIST -->
+  <div class="card">
+    <div class="sect-title">Distribución por estado</div>
+    <div class="st-row" id="status-dist"></div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-card">
+    <div class="filter-row">
+      <div class="f-section" style="flex:2;min-width:200px">
+        <div class="f-label">Estado</div>
+        <div class="fpills" id="status-filters"></div>
+      </div>
+      <div class="f-section" style="max-width:260px">
+        <div class="f-label">Consultor</div>
+        <select class="f-select" id="consultant-filter" onchange="setConsultantFilter(this.value)">
+          <option value="">Todos los consultores</option>
+        </select>
+      </div>
+      <div class="f-section" style="flex:1;min-width:180px">
+        <div class="f-label">Tipo de actividad</div>
+        <div class="fpills" id="ta-filters"></div>
+      </div>
+    </div>
+    <div class="filter-row" style="align-items:flex-end">
+      <div class="f-section" style="max-width:210px">
+        <div class="f-label">Período (horas cargadas)</div>
+        <select class="f-select" id="period-filter" onchange="setPeriodFilter(this.value)">
+          <option value="">Todos los períodos</option>
+        </select>
+      </div>
+      <div class="f-section" style="max-width:320px">
+        <div class="f-label">Rango de fechas (worklogs)</div>
+        <div class="date-pair">
+          <input type="date" class="f-input" id="date-from" onchange="setDateRange()">
+          <span class="date-sep">—</span>
+          <input type="date" class="f-input" id="date-to" onchange="setDateRange()">
+        </div>
+      </div>
+      <div class="f-right">
+        <button class="clear-btn" id="clear-btn" onclick="clearFilters()">✕ Limpiar filtros</button>
+        <div class="match-info" id="match-info"></div>
+        <div class="period-note" id="period-note" style="display:none">Horas filtradas por fecha de carga</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASES TABLE -->
+  <div class="card">
+    <div class="sort-row">
+      <div class="sort-left">
+        <span class="sort-lbl">Ordenar:</span>
+        <button class="sort-btn active" id="sort-h" onclick="setSort('hours')">Horas ↓</button>
+        <button class="sort-btn" id="sort-d" onclick="setSort('date')">Actualizado ↓</button>
+        <button class="sort-btn" id="sort-s" onclick="setSort('status')">Estado</button>
+        <button class="sort-btn" id="sort-t" onclick="setSort('tipo')">Tipo</button>
+      </div>
+      <span class="tbl-count" id="tbl-count"></span>
+    </div>
+    <div class="tbl-wrap">
+      <div class="trow thd">
+        <span>Caso</span>
+        <span>Resumen</span>
+        <span>Estado</span>
+        <span class="t-hide">Tipo</span>
+        <span id="col-h-label">Horas</span>
+        <span class="t-hide">Progreso</span>
+        <span style="text-align:center">Vinc.</span>
+        <span></span>
+      </div>
+      <div id="cases-body"></div>
+    </div>
+  </div>
+
+  <!-- CONSULTANT RANKING -->
+  <div class="card">
+    <div class="sect-title" id="ranking-title">Ranking de consultores</div>
+    <div id="ranking"></div>
+  </div>
+
+</div>
+
+<script>
+/* ── STATE (se llena vía fetch a /api/jira-search) ── */
+let CASES = [];
+let WORKLOG_DATA = {};
+let currentProject = '';
+
+const STATUS_COLORS = [
+  {lc:'#A86500',dc:'#D4940A',bgl:'#FFF3DC',bgd:'#2A1E00'},
+  {lc:'#0B7A7A',dc:'#15AAAA',bgl:'#DCF5F5',bgd:'#002A2A'},
+  {lc:'#1A9A5A',dc:'#32BC72',bgl:'#DDF5EB',bgd:'#002A1A'},
+  {lc:'#7A3CBF',dc:'#A060E8',bgl:'#F0E8FB',bgd:'#1A0A30'},
+  {lc:'#C24E18',dc:'#F07848',bgl:'#FDE8DC',bgd:'#2A0E00'},
+  {lc:'#0278D2',dc:'#2E90E0',bgl:'#DCF0FF',bgd:'#021A30'},
+];
+const TIPO_COLORS = STATUS_COLORS;
+const statusColorCache = {};
+const tipoColorCache = {};
+function colorFor(name, cache, palette) {
+  if (!name) return {lc:'#8A97AF',dc:'#8A97AF',bgl:'#EDF1F6',bgd:'#1A2438'};
+  if (!cache[name]) cache[name] = palette[Object.keys(cache).length % palette.length];
+  return cache[name];
+}
+const LINKED_COLORS = {'Finalizada':'#1A9A5A','Terminada':'#1A9A5A','En curso':'#0278D2','In Progress':'#0278D2','Tareas por hacer':'#8A97AF','To Do':'#8A97AF'};
+const JIRA = 'https://justtimeconsulting.atlassian.net/browse/';
+
+/* ── FILTER STATE ────────────────────────────────── */
+let sortBy='hours', filterStatus='', filterConsultant='', filterTipo='';
+let filterPeriod='', filterDateFrom='', filterDateTo='';
+let expanded=new Set();
+
+/* ── SEARCH ──────────────────────────────────────── */
+document.getElementById('project-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runSearch();
+});
+
+async function runSearch() {
+  const input = document.getElementById('project-input');
+  const project = input.value.trim().toUpperCase();
+  const btn = document.getElementById('search-btn');
+  const status = document.getElementById('search-status');
+  if (!project) { status.className='search-status err'; status.textContent='Escribe una clave de proyecto.'; return; }
+
+  btn.disabled = true;
+  status.className = 'search-status';
+  status.textContent = 'Consultando Jira en vivo…';
+
+  try {
+    const res = await fetch(`/api/jira-search?project=${encodeURIComponent(project)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error desconocido');
+
+    currentProject = data.project;
+    CASES = data.cases || [];
+    WORKLOG_DATA = data.worklogData || {};
+
+    Object.keys(statusColorCache).forEach(k => delete statusColorCache[k]);
+    Object.keys(tipoColorCache).forEach(k => delete tipoColorCache[k]);
+
+    clearFilters();
+    document.getElementById('kpi-casos-sub').textContent = `en proyecto ${currentProject}`;
+    status.className = 'search-status ok';
+    status.textContent = `${CASES.length} caso(s) encontrados en ${currentProject}.`;
+    renderAll();
+  } catch (err) {
+    status.className = 'search-status err';
+    status.textContent = 'Error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ── WORKLOG HELPERS ─────────────────────────────── */
+function getWorklogs(key) {
+  const entries = WORKLOG_DATA[key] || [];
+  if(!filterDateFrom && !filterDateTo) return entries;
+  return entries.filter(e => {
+    if(filterDateFrom && e.date < filterDateFrom) return false;
+    if(filterDateTo   && e.date > filterDateTo)   return false;
+    return true;
+  });
+}
+function sumHours(entries) {
+  return Math.round(entries.reduce((s,e)=>s+e.hours,0)*100)/100;
+}
+function byConsultant(entries) {
+  const t={};
+  entries.forEach(e=>{ t[e.consultant]=(t[e.consultant]||0)+e.hours; });
+  return Object.entries(t).sort((a,b)=>b[1]-a[1]).map(([name,hours])=>({name,hours:Math.round(hours*100)/100}));
+}
+function dateActive() { return !!(filterDateFrom||filterDateTo); }
+
+/* ── COLOR HELPERS ───────────────────────────────── */
+function dark() {
+  const t=document.documentElement.getAttribute('data-theme');
+  return t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+}
+function sc(status) {
+  const cfg=colorFor(status, statusColorCache, STATUS_COLORS);
+  return dark()?{fg:cfg.dc,bg:cfg.bgd,label:status}:{fg:cfg.lc,bg:cfg.bgl,label:status};
+}
+function tc(tipo) {
+  const cfg=colorFor(tipo, tipoColorCache, TIPO_COLORS);
+  return dark()?{fg:cfg.dc,bg:cfg.bgd}:{fg:cfg.lc,bg:cfg.bgl};
+}
+
+/* ── PERIODS ─────────────────────────────────────── */
+function getAvailablePeriods() {
+  const months=new Set();
+  Object.values(WORKLOG_DATA).forEach(es=>es.forEach(e=>months.add(e.date.substring(0,7))));
+  return [...months].sort().reverse();
+}
+function periodLabel(p) {
+  const [y,m]=p.split('-');
+  const ns=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${ns[parseInt(m)]} ${y}`;
+}
+function periodToDateRange(p) {
+  const [y,m]=p.split('-').map(Number);
+  const from=`${y}-${String(m).padStart(2,'0')}-01`;
+  const last=new Date(y,m,0).getDate();
+  return {from, to:`${y}-${String(m).padStart(2,'0')}-${last}`};
+}
+
+/* ── FILTER LOGIC ────────────────────────────────── */
+function anyFilter() { return !!(filterStatus||filterConsultant||filterTipo||filterDateFrom||filterDateTo); }
+
+function getFiltered() {
+  return getSorted().filter(c=>{
+    if(filterStatus && c.status!==filterStatus) return false;
+    if(filterTipo   && c.tipoActividad!==filterTipo) return false;
+    if(filterConsultant) {
+      const entries = getWorklogs(c.key);
+      if(!entries.some(e=>e.consultant===filterConsultant)) return false;
+    }
+    return true;
+  });
+}
+function getSorted() {
+  const a=[...CASES];
+  if(sortBy==='hours') {
+    return a.sort((x,y)=>sumHours(getWorklogs(y.key))-sumHours(getWorklogs(x.key)));
+  }
+  if(sortBy==='date')   return a.sort((x,y)=>y.updated.localeCompare(x.updated));
+  if(sortBy==='status') return a.sort((x,y)=>x.status.localeCompare(y.status));
+  if(sortBy==='tipo')   return a.sort((x,y)=>x.tipoActividad.localeCompare(y.tipoActividad));
+  return a;
+}
+
+/* ── KPIs ────────────────────────────────────────── */
+function updateKPIs() {
+  const f=getFiltered();
+  let total=0;
+  const names=new Set();
+  let conAct=0;
+  f.forEach(c=>{
+    const entries=getWorklogs(c.key);
+    const h=sumHours(entries);
+    total+=h;
+    if(h>0) conAct++;
+    entries.forEach(e=>names.add(e.consultant));
+  });
+
+  const pActive=dateActive();
+  document.getElementById('kpi-casos').textContent=f.length;
+  document.getElementById('kpi-h').textContent=total.toFixed(1)+'h';
+  document.getElementById('kpi-h-label').textContent=pActive?'Horas en período':'Horas consumidas';
+  document.getElementById('kpi-h-sub').textContent=pActive?'worklogs en rango seleccionado':'en issues vinculadas';
+  document.getElementById('kpi-h-card').className='kpi'+(pActive?' kpi-period':' kpi-accent');
+  document.getElementById('kpi-act').textContent=conAct;
+  document.getElementById('kpi-act-sub').textContent=pActive?'con actividad en período':'casos con horas registradas';
+  document.getElementById('kpi-c').textContent=names.size;
+  document.getElementById('kpi-c-sub').textContent=pActive?'activos en período':'con horas registradas';
+
+  const colH=document.getElementById('col-h-label');
+  if(colH) colH.textContent=pActive?'Horas (período)':'Horas';
+  const pNote=document.getElementById('period-note');
+  if(pNote) pNote.style.display=pActive?'block':'none';
+}
+
+/* ── STATUS DIST ─────────────────────────────────── */
+function renderStatusDist() {
+  const counts={};
+  CASES.forEach(c=>{counts[c.status]=(counts[c.status]||0)+1;});
+  document.getElementById('status-dist').innerHTML=
+    Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([st,ct])=>{
+      const s=sc(st);
+      return `<div class="st-chip" style="background:${s.bg};color:${s.fg};border-color:${s.fg}30">
+        <span class="ct">${ct}</span><span class="lb">${s.label}</span></div>`;
+    }).join('');
+}
+
+/* ── FILTER UI ───────────────────────────────────── */
+function renderFilters() {
+  const stCounts={};
+  CASES.forEach(c=>{stCounts[c.status]=(stCounts[c.status]||0)+1;});
+  const stEl=document.getElementById('status-filters');
+  stEl.innerHTML='';
+  const allSt=document.createElement('button');
+  allSt.className='fpill'+(filterStatus===''?' active':'');
+  allSt.dataset.status='';
+  allSt.textContent=`Todos (${CASES.length})`;
+  stEl.appendChild(allSt);
+  Object.entries(stCounts).sort((a,b)=>b[1]-a[1]).forEach(([st,ct])=>{
+    const s=sc(st);
+    const btn=document.createElement('button');
+    btn.className='fpill st-pill'+(filterStatus===st?' active':'');
+    btn.dataset.status=st;
+    btn.style.setProperty('--st-fg',s.fg);
+    btn.style.setProperty('--st-bg',s.bg);
+    btn.textContent=`${s.label} (${ct})`;
+    stEl.appendChild(btn);
+  });
+  stEl.onclick=e=>{
+    const b=e.target.closest('.fpill'); if(!b) return;
+    setStatusFilter(b.dataset.status);
+  };
+
+  const taCounts={};
+  CASES.forEach(c=>{taCounts[c.tipoActividad]=(taCounts[c.tipoActividad]||0)+1;});
+  const taEl=document.getElementById('ta-filters');
+  taEl.innerHTML='';
+  const allTa=document.createElement('button');
+  allTa.className='fpill'+(filterTipo===''?' active':'');
+  allTa.dataset.tipo='';
+  allTa.textContent='Todos';
+  taEl.appendChild(allTa);
+  Object.entries(taCounts).sort((a,b)=>b[1]-a[1]).forEach(([tp,ct])=>{
+    const t=tc(tp);
+    const btn=document.createElement('button');
+    btn.className='fpill ta-pill'+(filterTipo===tp?' active':'');
+    btn.dataset.tipo=tp;
+    btn.style.setProperty('--ta-fg',t.fg);
+    btn.style.setProperty('--ta-bg',t.bg);
+    btn.textContent=`${tp||'(sin tipo)'} (${ct})`;
+    taEl.appendChild(btn);
+  });
+  taEl.onclick=e=>{
+    const b=e.target.closest('.fpill'); if(!b) return;
+    setTipoFilter(b.dataset.tipo);
+  };
+
+  const sel=document.getElementById('consultant-filter');
+  const totals={};
+  CASES.forEach(c=>getWorklogs(c.key).forEach(e=>{totals[e.consultant]=(totals[e.consultant]||0)+e.hours;}));
+  sel.innerHTML='<option value="">Todos los consultores</option>';
+  Object.entries(totals).sort((a,b)=>b[1]-a[1]).forEach(([name,h])=>{
+    const o=document.createElement('option');
+    o.value=name; o.textContent=`${name} (${h.toFixed(1)}h)`;
+    if(name===filterConsultant) o.selected=true;
+    sel.appendChild(o);
+  });
+
+  const pSel=document.getElementById('period-filter');
+  pSel.innerHTML='<option value="">Todos los períodos</option>';
+  getAvailablePeriods().forEach(p=>{
+    const o=document.createElement('option');
+    o.value=p; o.textContent=periodLabel(p);
+    if(p===filterPeriod) o.selected=true;
+    pSel.appendChild(o);
+  });
+
+  const df=document.getElementById('date-from');
+  const dt=document.getElementById('date-to');
+  df.value=filterDateFrom; dt.value=filterDateTo;
+  df.className='f-input'+(filterDateFrom?' active-date':'');
+  dt.className='f-input'+(filterDateTo?' active-date':'');
+}
+
+function setStatusFilter(s) {
+  filterStatus=s;
+  document.querySelectorAll('#status-filters .fpill').forEach(b=>b.classList.toggle('active',b.dataset.status===s));
+  update();
+}
+function setTipoFilter(t) {
+  filterTipo=t;
+  document.querySelectorAll('#ta-filters .fpill').forEach(b=>b.classList.toggle('active',b.dataset.tipo===t));
+  update();
+}
+function setConsultantFilter(v) { filterConsultant=v; update(); }
+function setPeriodFilter(p) {
+  filterPeriod=p;
+  if(p) { const {from,to}=periodToDateRange(p); filterDateFrom=from; filterDateTo=to; }
+  else  { filterDateFrom=''; filterDateTo=''; }
+  renderFilters();
+  update();
+}
+function setDateRange() {
+  filterDateFrom=document.getElementById('date-from').value;
+  filterDateTo  =document.getElementById('date-to').value;
+  filterPeriod='';
+  getAvailablePeriods().forEach(p=>{
+    const {from,to}=periodToDateRange(p);
+    if(from===filterDateFrom && to===filterDateTo) filterPeriod=p;
+  });
+  document.getElementById('period-filter').value=filterPeriod;
+  const df=document.getElementById('date-from');
+  const dt=document.getElementById('date-to');
+  df.className='f-input'+(filterDateFrom?' active-date':'');
+  dt.className='f-input'+(filterDateTo?' active-date':'');
+  update();
+}
+function clearFilters() {
+  filterStatus=''; filterConsultant=''; filterTipo='';
+  filterPeriod=''; filterDateFrom=''; filterDateTo='';
+  expanded=new Set();
+}
+
+function updateClearAndCount() {
+  document.getElementById('clear-btn').style.display=anyFilter()?'block':'none';
+  const n=getFiltered().length;
+  const info=document.getElementById('match-info');
+  if(anyFilter()&&n<CASES.length) {
+    info.innerHTML=`<span class="match-highlight">${n}</span> de ${CASES.length} casos`;
+  } else { info.textContent=''; }
+}
+
+/* ── SORT ────────────────────────────────────────── */
+function setSort(s) {
+  sortBy=s;
+  ['h','d','s','t'].forEach(x=>{ const e=document.getElementById('sort-'+x); if(e) e.classList.remove('active'); });
+  const map={hours:'h',date:'d',status:'s',tipo:'t'};
+  const e=document.getElementById('sort-'+map[s]); if(e) e.classList.add('active');
+  renderCases();
+}
+
+/* ── CASES TABLE ─────────────────────────────────── */
+function renderCases() {
+  const filtered=getFiltered();
+  document.getElementById('tbl-count').textContent=`${filtered.length} caso${filtered.length!==1?'s':''}`;
+  const body=document.getElementById('cases-body');
+  body.innerHTML='';
+
+  const pActive=dateActive();
+  const maxH=filtered.length>0 ? Math.max(...filtered.map(c=>sumHours(getWorklogs(c.key))),1) : 1;
+
+  if(filtered.length===0) {
+    const d=document.createElement('div');
+    d.className='empty-state';
+    d.innerHTML=CASES.length===0
+      ? '<strong>Sin datos</strong>Busca un proyecto arriba para empezar.'
+      : '<strong>Sin resultados</strong>Ajusta los filtros para ver casos.';
+    body.appendChild(d); return;
+  }
+
+  filtered.forEach(c=>{
+    const s=sc(c.status);
+    const t=tc(c.tipoActividad);
+    const entries=getWorklogs(c.key);
+    const h=sumHours(entries);
+    const pct=(h/maxH*100).toFixed(1);
+    const isOpen=expanded.has(c.key);
+
+    const row=document.createElement('div');
+    row.className='trow';
+    row.innerHTML=`
+      <span class="t-key"><a href="${JIRA}${c.key}" target="_blank" rel="noopener">${c.key}</a></span>
+      <span class="t-summ" title="${c.summary}">${c.summary}</span>
+      <span><span class="spill" style="background:${s.bg};color:${s.fg}">${s.label}</span></span>
+      <span class="t-hide">${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}</span>
+      <span class="${h>0?(pActive?'t-h period-h':'t-h'):'t-zero'}">${h>0?h+'h':'—'}</span>
+      <div class="t-hide mini-track"><div class="mini-fill" style="background:${pActive?'#FC5E32':s.fg}" data-w="${pct}%"></div></div>
+      <span class="t-vc">${c.linkedCount||'—'}</span>
+      <button class="tog-btn${isOpen?' open':''}" data-key="${c.key}">${isOpen?'▲':'▼'}</button>`;
+    body.appendChild(row);
+
+    if(isOpen) {
+      const exp=document.createElement('div');
+      exp.className='exp-row';
+      const byC=byConsultant(entries);
+      exp.innerHTML=`<div class="exp-meta">
+        <span>Actualizado: <strong>${fmtDate(c.updated)}</strong></span>
+        ${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}
+        ${pActive?`<span style="color:#FC5E32;font-weight:600;font-size:10px">▶ Horas en período: ${h}h</span>`:''}
+      </div>`;
+      if(byC.length>0) {
+        const maxCH=byC[0].hours;
+        const stE=Object.entries(c.linkedStatuses||{});
+        exp.innerHTML+=`<div class="exp-grid">
+          <div>
+            <div class="exp-title">${pActive?'Horas por consultor (en período)':'Horas por consultor'}</div>
+            ${byC.map((bc,i)=>`
+              <div class="cons-item">
+                <span class="cons-name">${bc.name}</span>
+                <div class="cons-bar"><div class="cons-fill" style="background:${i<2?s.fg:'var(--t3)'}" data-w="${(bc.hours/maxCH*100).toFixed(1)}%"></div></div>
+                <span class="cons-h">${bc.hours}h</span>
+              </div>`).join('')}
+          </div>
+          <div class="st-counts">
+            <div class="exp-title">Issues vinculadas</div>
+            ${stE.length?stE.map(([st,ct])=>`
+              <div class="stc-item">
+                <div class="stc-dot" style="background:${LINKED_COLORS[st]||'#8A97AF'}"></div>
+                <span>${st}</span><span class="stc-n">${ct}</span>
+              </div>`).join('')
+            :'<span style="font-size:11px;color:var(--t3)">Sin issues</span>'}
+          </div>
+        </div>`;
+      } else {
+        exp.innerHTML+='<span style="font-size:12px;color:var(--t3)">Sin actividad'+(pActive?' en el período seleccionado':' registrada')+'.</span>';
+      }
+      body.appendChild(exp);
+    }
+  });
+
+  body.onclick=e=>{
+    const btn=e.target.closest('.tog-btn'); if(!btn) return;
+    const k=btn.dataset.key;
+    if(expanded.has(k)) expanded.delete(k); else expanded.add(k);
+    renderCases();
+  };
+
+  animateBars();
+}
+
+function fmtDate(d) {
+  if(!d) return '—';
+  const [y,m,day]=d.split('-');
+  const ns=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${parseInt(day)} ${ns[parseInt(m)]} ${y}`;
+}
+
+/* ── CONSULTANT RANKING ─────────────────────────── */
+function renderRanking() {
+  const filtered=getFiltered();
+  const pActive=dateActive();
+  const totals={};
+  filtered.forEach(c=>getWorklogs(c.key).forEach(e=>{totals[e.consultant]=(totals[e.consultant]||0)+e.hours;}));
+  const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const maxH=sorted[0]?.[1]||1;
+  const title=document.getElementById('ranking-title');
+  if(title) title.textContent=pActive?'Ranking de consultores (período seleccionado)':'Ranking de consultores';
+  document.getElementById('ranking').innerHTML=sorted.length?sorted.map(([name,h],i)=>`
+    <div class="rc-item rc-rank-${i<1?1:i<3?2:3}">
+      <span class="rc-name">${name}</span>
+      <div class="rc-track"><div class="rc-fill" data-w="${(h/maxH*100).toFixed(1)}%"></div></div>
+      <span class="rc-h">${h.toFixed(1)}h</span>
+    </div>`).join('')
+    :'<div class="empty-state" style="padding:16px"><strong>Sin datos</strong>Ajusta los filtros o busca un proyecto.</div>';
+}
+
+/* ── ANIMATIONS ─────────────────────────────────── */
+function animateBars() {
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('[data-w]').forEach(el=>{
+      setTimeout(()=>{el.style.width=el.dataset.w;},60);
+    });
+  });
+}
+
+/* ── THEME ───────────────────────────────────────── */
+function toggleTheme() {
+  document.documentElement.setAttribute('data-theme',dark()?'light':'dark');
+  renderAll();
+}
+
+/* ── MASTER UPDATE ───────────────────────────────── */
+function update() {
+  updateClearAndCount();
+  updateKPIs();
+  renderFilters();
+  renderCases();
+  renderRanking();
+}
+function renderAll() {
+  renderStatusDist();
+  renderFilters();
+  update();
+}
+
+renderAll();
+</script>
