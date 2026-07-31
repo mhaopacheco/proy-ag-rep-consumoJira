@@ -735,6 +735,7 @@ function renderCases() {
         <span>Actualizado: <strong>${fmtDate(c.updated)}</strong></span>
         ${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}
         ${pActive?`<span style="color:#FC5E32;font-weight:600;font-size:10px">▶ Horas en período: ${h}h</span>`:''}
+        <a href="jira-horas-dashboard.html?key=${c.key}" target="_blank" rel="noopener" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--ac)">Detalle por consultor/mes →</a>
       </div>`;
       if(byC.length>0) {
         const maxCH=byC[0].hours;
