@@ -31,10 +31,19 @@ body{background:var(--bg);color:var(--t1);font-family:'Rubik','Ubuntu','Segoe UI
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:18px 20px}
 .sect-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:12px}
 
-.search-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:16px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.search-input{flex:1;min-width:220px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:9px 14px;font-size:14px;color:var(--t1);font-family:'Courier New',monospace;font-weight:700;letter-spacing:.03em;outline:none}
+.search-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:16px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:relative}
+.search-box{flex:1;min-width:220px;position:relative}
+.search-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:9px 14px;font-size:14px;color:var(--t1);font-family:'Courier New',monospace;font-weight:700;letter-spacing:.03em;outline:none}
 .search-input:focus{border-color:var(--ac)}
 .search-input::placeholder{font-family:inherit;font-weight:400;color:var(--t3)}
+.search-dd{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:8px;box-shadow:0 4px 16px rgba(17,39,60,.15);max-height:280px;overflow-y:auto;z-index:20;display:none}
+.search-dd.open{display:block}
+.search-dd-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--t1)}
+.search-dd-item:hover,.search-dd-item.hi{background:var(--ac-s)}
+.search-dd-key{font-family:'Courier New',monospace;font-weight:700;color:var(--ac);min-width:70px}
+.search-dd-name{color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-dd-empty{padding:10px 14px;font-size:12px;color:var(--t3)}
+.search-dd-icon{width:14px;height:14px;border-radius:3px;flex-shrink:0}
 .search-btn{background:var(--jtc-blue);border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap}
 .search-btn:hover{background:#0263AD}
 .search-btn:disabled{opacity:.6;cursor:default}
@@ -157,7 +166,10 @@ body{background:var(--bg);color:var(--t1);font-family:'Rubik','Ubuntu','Segoe UI
 
   <!-- SEARCH -->
   <div class="search-card">
-    <input class="search-input" id="project-input" placeholder="Clave de proyecto, ej. ATIHD" autocomplete="off" spellcheck="false">
+    <div class="search-box">
+      <input class="search-input" id="project-input" placeholder="Escribe para buscar un proyecto…" autocomplete="off" spellcheck="false">
+      <div class="search-dd" id="search-dd"></div>
+    </div>
     <button class="search-btn" id="search-btn" onclick="runSearch()">Buscar</button>
     <div class="search-status" id="search-status"></div>
   </div>
@@ -298,9 +310,90 @@ let sortBy='hours', filterStatus='', filterConsultant='', filterTipo='';
 let filterPeriod='', filterDateFrom='', filterDateTo='';
 let expanded=new Set();
 
-/* ── SEARCH ──────────────────────────────────────── */
-document.getElementById('project-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') runSearch();
+/* ── SEARCH: autocomplete de proyectos ───────────── */
+const projectInput = document.getElementById('project-input');
+const searchDD = document.getElementById('search-dd');
+let ddItems = [];
+let ddHi = -1;
+let ddDebounce = null;
+let ddSeq = 0;
+
+async function fetchProjectSuggestions(q) {
+  const seq = ++ddSeq;
+  try {
+    const res = await fetch(`/api/jira-projects?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if (seq !== ddSeq) return;
+    if (!res.ok) { closeDD(); return; }
+    renderDD(data.projects || []);
+  } catch {
+    if (seq === ddSeq) closeDD();
+  }
+}
+
+function renderDD(projects) {
+  ddItems = projects;
+  ddHi = -1;
+  if (projects.length === 0) {
+    searchDD.innerHTML = '<div class="search-dd-empty">Sin coincidencias</div>';
+  } else {
+    searchDD.innerHTML = projects.map((p, i) => `
+      <div class="search-dd-item" data-i="${i}">
+        <span class="search-dd-key">${p.key}</span>
+        <span class="search-dd-name">${p.name}</span>
+      </div>`).join('');
+  }
+  searchDD.classList.add('open');
+}
+function closeDD() {
+  searchDD.classList.remove('open');
+  searchDD.innerHTML = '';
+  ddItems = []; ddHi = -1;
+}
+function highlightDD() {
+  searchDD.querySelectorAll('.search-dd-item').forEach((el, i) => el.classList.toggle('hi', i === ddHi));
+}
+function pickProject(p) {
+  projectInput.value = p.key;
+  closeDD();
+  runSearch();
+}
+
+projectInput.addEventListener('input', () => {
+  const q = projectInput.value.trim();
+  clearTimeout(ddDebounce);
+  if (!q) { closeDD(); return; }
+  ddDebounce = setTimeout(() => fetchProjectSuggestions(q), 250);
+});
+projectInput.addEventListener('focus', () => {
+  const q = projectInput.value.trim();
+  if (q) fetchProjectSuggestions(q);
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-box')) closeDD();
+});
+searchDD.addEventListener('click', e => {
+  const item = e.target.closest('.search-dd-item');
+  if (!item) return;
+  const p = ddItems[parseInt(item.dataset.i, 10)];
+  if (p) pickProject(p);
+});
+projectInput.addEventListener('keydown', e => {
+  const open = searchDD.classList.contains('open') && ddItems.length > 0;
+  if (e.key === 'ArrowDown' && open) {
+    e.preventDefault();
+    ddHi = Math.min(ddHi + 1, ddItems.length - 1);
+    highlightDD();
+  } else if (e.key === 'ArrowUp' && open) {
+    e.preventDefault();
+    ddHi = Math.max(ddHi - 1, 0);
+    highlightDD();
+  } else if (e.key === 'Enter') {
+    if (open && ddHi >= 0) { pickProject(ddItems[ddHi]); }
+    else { closeDD(); runSearch(); }
+  } else if (e.key === 'Escape') {
+    closeDD();
+  }
 });
 
 async function runSearch() {
@@ -308,6 +401,7 @@ async function runSearch() {
   const project = input.value.trim().toUpperCase();
   const btn = document.getElementById('search-btn');
   const status = document.getElementById('search-status');
+  closeDD();
   if (!project) { status.className='search-status err'; status.textContent='Escribe una clave de proyecto.'; return; }
 
   btn.disabled = true;
