@@ -74,6 +74,7 @@ async function getAllWorklogs(issueKey) {
       consultant: w.author?.displayName || 'Sin asignar',
       date: (w.started || '').slice(0, 10),
       hours: Math.round(((w.timeSpentSeconds || 0) / 3600) * 100) / 100,
+      issueKey,
     }))
     .filter(e => e.consultant !== 'Sin asignar' && e.hours > 0);
 }

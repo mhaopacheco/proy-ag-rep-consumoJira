@@ -124,7 +124,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Rubik','Ubuntu','Segoe UI
 .exp-grid{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:start}
 .exp-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:8px}
 .cons-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
-.cons-name{width:168px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.cons-name{width:220px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
 .cons-bar{flex:1;height:6px;background:var(--sf);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
 .cons-fill{height:100%;border-radius:3px}
 .cons-h{width:40px;font-variant-numeric:tabular-nums;font-weight:700;font-size:11px;color:var(--t2);text-align:right;flex-shrink:0}
@@ -451,6 +451,15 @@ function byConsultant(entries) {
   entries.forEach(e=>{ t[e.consultant]=(t[e.consultant]||0)+e.hours; });
   return Object.entries(t).sort((a,b)=>b[1]-a[1]).map(([name,hours])=>({name,hours:Math.round(hours*100)/100}));
 }
+function byConsultantIssue(entries) {
+  const t={};
+  entries.forEach(e=>{
+    const k=(e.issueKey||'')+'|'+e.consultant;
+    if(!t[k]) t[k]={issueKey:e.issueKey||'',consultant:e.consultant,hours:0};
+    t[k].hours+=e.hours;
+  });
+  return Object.values(t).sort((a,b)=>b.hours-a.hours).map(x=>({...x,hours:Math.round(x.hours*100)/100}));
+}
 function dateActive() { return !!(filterDateFrom||filterDateTo); }
 
 /* ── COLOR HELPERS ───────────────────────────────── */
@@ -730,7 +739,7 @@ function renderCases() {
     if(isOpen) {
       const exp=document.createElement('div');
       exp.className='exp-row';
-      const byC=byConsultant(entries);
+      const byC=byConsultantIssue(entries);
       exp.innerHTML=`<div class="exp-meta">
         <span>Actualizado: <strong>${fmtDate(c.updated)}</strong></span>
         ${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}
@@ -745,7 +754,7 @@ function renderCases() {
             <div class="exp-title">${pActive?'Horas por consultor (en período)':'Horas por consultor'}</div>
             ${byC.map((bc,i)=>`
               <div class="cons-item">
-                <span class="cons-name">${bc.name}</span>
+                <span class="cons-name">${bc.issueKey?`<span class="t-key" style="margin-right:6px">${bc.issueKey}</span>`:''}${bc.consultant}</span>
                 <div class="cons-bar"><div class="cons-fill" style="background:${i<2?s.fg:'var(--t3)'}" data-w="${(bc.hours/maxCH*100).toFixed(1)}%"></div></div>
                 <span class="cons-h">${bc.hours}h</span>
               </div>`).join('')}
