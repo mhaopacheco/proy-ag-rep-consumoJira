@@ -36,9 +36,19 @@ async function findActivityFieldId() {
   return cachedActivityFieldId;
 }
 
-async function searchIssues(projectKey, activityFieldId, limit) {
+let cachedEstimationFieldId;
+async function findEstimationFieldId() {
+  if (cachedEstimationFieldId !== undefined) return cachedEstimationFieldId;
+  const fields = await jiraFetch('/rest/api/3/field');
+  const match = fields.find(f => /estimaci.*total/i.test(f.name));
+  cachedEstimationFieldId = match ? match.id : null;
+  return cachedEstimationFieldId;
+}
+
+async function searchIssues(projectKey, activityFieldId, estimationFieldId, limit) {
   const fieldsList = ['summary', 'status', 'created', 'updated', 'issuelinks'];
   if (activityFieldId) fieldsList.push(activityFieldId);
+  if (estimationFieldId) fieldsList.push(estimationFieldId);
 
   let issues = [];
   let nextPageToken;
@@ -105,7 +115,8 @@ module.exports = async (req, res) => {
 
   try {
     const activityFieldId = await findActivityFieldId();
-    const issues = await searchIssues(projectKey, activityFieldId, limit);
+    const estimationFieldId = await findEstimationFieldId();
+    const issues = await searchIssues(projectKey, activityFieldId, estimationFieldId, limit);
 
     const cases = [];
     const worklogData = {};
@@ -124,11 +135,15 @@ module.exports = async (req, res) => {
         const tipoRaw = activityFieldId ? fields[activityFieldId] : null;
         const tipoActividad = tipoRaw && typeof tipoRaw === 'object' ? tipoRaw.value : tipoRaw || '';
 
+        const estRaw = estimationFieldId ? fields[estimationFieldId] : null;
+        const estimacionTotal = estRaw && typeof estRaw === 'object' ? (estRaw.value ?? '') : (estRaw ?? '');
+
         cases.push({
           key,
           summary: fields.summary || '',
           status: fields.status?.name || '',
           tipoActividad,
+          estimacionTotal,
           created: (fields.created || '').slice(0, 10),
           updated: (fields.updated || '').slice(0, 10),
           linkedCount: linkedKeys.length,

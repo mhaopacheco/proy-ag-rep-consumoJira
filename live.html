@@ -102,7 +102,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .tbl-count{font-size:11px;color:var(--t3)}
 
 .tbl-wrap{overflow-x:auto}
-.trow{display:grid;grid-template-columns:82px 1fr 148px 88px 78px 90px 34px 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.trow{display:grid;grid-template-columns:82px 1fr 148px 88px 90px 78px 90px 34px 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.t-est{font-variant-numeric:tabular-nums;color:var(--t2)}
 .trow:last-child{border-bottom:none}
 .thd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:4px 0 6px}
 @media(max-width:760px){.trow{grid-template-columns:78px 1fr 140px 65px 30px 28px}.t-hide{display:none}}
@@ -266,6 +267,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
         <span>Resumen</span>
         <span>Estado</span>
         <span class="t-hide">Tipo</span>
+        <span class="t-hide">Estimación Total</span>
         <span id="col-h-label">Horas</span>
         <span class="t-hide">Progreso</span>
         <span style="text-align:center">Vinc.</span>
@@ -399,7 +401,7 @@ projectInput.addEventListener('keydown', e => {
   }
 });
 
-async function runSearch() {
+async function runSearch(preserveFilters) {
   const input = document.getElementById('project-input');
   const project = input.value.trim().toUpperCase();
   const btn = document.getElementById('search-btn');
@@ -423,7 +425,7 @@ async function runSearch() {
     Object.keys(statusColorCache).forEach(k => delete statusColorCache[k]);
     Object.keys(tipoColorCache).forEach(k => delete tipoColorCache[k]);
 
-    clearFilters();
+    if (!preserveFilters) clearFilters();
     document.getElementById('kpi-casos-sub').textContent = `en proyecto ${currentProject}`;
     status.className = 'search-status ok';
     status.textContent = `${CASES.length} caso(s) encontrados en ${currentProject}.`;
@@ -733,6 +735,7 @@ function renderCases() {
       <span class="t-summ" title="${c.summary}">${c.summary}</span>
       <span><span class="spill" style="background:${s.bg};color:${s.fg}">${s.label}</span></span>
       <span class="t-hide">${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}</span>
+      <span class="t-hide t-est">${c.estimacionTotal!==''&&c.estimacionTotal!=null?c.estimacionTotal+'h':'—'}</span>
       <span class="${h>0?(pActive?'t-h period-h':'t-h'):'t-zero'}">${h>0?h+'h':'—'}</span>
       <div class="t-hide mini-track"><div class="mini-fill" style="background:${pActive?'#FC5E32':s.fg}" data-w="${pct}%"></div></div>
       <span class="t-vc">${c.linkedCount||'—'}</span>
@@ -837,6 +840,7 @@ function update() {
   renderFilters();
   renderCases();
   renderRanking();
+  saveState();
 }
 function renderAll() {
   renderStatusDist();
@@ -844,5 +848,42 @@ function renderAll() {
   update();
 }
 
-renderAll();
+/* ── PERSISTENCIA DE FILTROS (volver desde detalle) ── */
+const STATE_KEY = 'jtc_live_state';
+function saveState() {
+  if (!currentProject) return;
+  sessionStorage.setItem(STATE_KEY, JSON.stringify({
+    project: currentProject,
+    filterStatus, filterConsultant, filterTipo,
+    filterPeriod, filterDateFrom, filterDateTo,
+    sortBy,
+  }));
+}
+function loadState() {
+  try { return JSON.parse(sessionStorage.getItem(STATE_KEY) || 'null'); }
+  catch { return null; }
+}
+function applySortButtonClass(s) {
+  ['h','d','s','t'].forEach(x=>{ const e=document.getElementById('sort-'+x); if(e) e.classList.remove('active'); });
+  const map={hours:'h',date:'d',status:'s',tipo:'t'};
+  const e=document.getElementById('sort-'+map[s]); if(e) e.classList.add('active');
+}
+
+(function init() {
+  const saved = loadState();
+  if (saved && saved.project) {
+    document.getElementById('project-input').value = saved.project;
+    filterStatus = saved.filterStatus || '';
+    filterConsultant = saved.filterConsultant || '';
+    filterTipo = saved.filterTipo || '';
+    filterPeriod = saved.filterPeriod || '';
+    filterDateFrom = saved.filterDateFrom || '';
+    filterDateTo = saved.filterDateTo || '';
+    sortBy = saved.sortBy || 'hours';
+    applySortButtonClass(sortBy);
+    runSearch(true);
+  } else {
+    renderAll();
+  }
+})();
 </script>
