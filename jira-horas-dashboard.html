@@ -1,4 +1,7 @@
 <title>Consumo de Horas · Detalle de caso — JTC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#ECF1F9; --sf:#FFF; --sf2:#F4F7FC; --bd:#CDD8EC;
@@ -39,7 +42,7 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5;padding:20px}
+body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5;padding:20px}
 .wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:20px}
@@ -57,6 +60,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',system-ui,-appl
 .search-status.err{color:#D94520;font-weight:600}
 .theme-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;flex-shrink:0}
 .theme-btn:hover{color:var(--t1)}
+.back-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--t2);cursor:pointer;flex-shrink:0;text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.back-btn:hover{color:var(--ac);border-color:var(--ac)}
 
 /* HEADER */
 .hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -105,6 +110,7 @@ table.mx tfoot td:first-child{background:var(--sf)}
 
   <!-- SEARCH -->
   <div class="card search-card">
+    <a class="back-btn" href="live.html">← Volver</a>
     <input class="search-input" id="key-input" placeholder="Ej: ATIHD-50" autocomplete="off" spellcheck="false">
     <button class="search-btn" id="search-btn" onclick="runSearch()">Buscar</button>
     <button class="theme-btn" onclick="toggleTheme()">◑ Tema</button>

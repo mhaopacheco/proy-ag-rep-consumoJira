@@ -1,4 +1,7 @@
 <title>Jira Live · Consumo de Horas por Proyecto — JTC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --jtc-navy:#11273C;--jtc-blue:#0278D2;--jtc-org:#FC5E32;--jtc-yel:#FFED00;
@@ -15,7 +18,7 @@
 :root[data-theme=light]{--bg:#EEF3F9;--sf:#FFF;--sf2:#F5F8FC;--bd:#C8D4E0;--ac:#0278D2;--ac-s:#DCF0FF;--t1:#11273C;--t2:#3D5568;--t3:#7A90A4;--sh:0 1px 4px rgba(17,39,60,.08);}
 :root[data-theme=dark]{--bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;--ac:#2E90E0;--ac-s:#0F2040;--t1:#E0EAF6;--t2:#8095B0;--t3:#506070;--sh:0 1px 4px rgba(0,0,0,.35);}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--t1);font-family:'Rubik','Ubuntu','Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5}
+body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5}
 
 .brand-hdr{background:var(--jtc-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .brand-logo{display:flex;align-items:baseline;gap:8px}
@@ -744,7 +747,7 @@ function renderCases() {
         <span>Actualizado: <strong>${fmtDate(c.updated)}</strong></span>
         ${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}
         ${pActive?`<span style="color:#FC5E32;font-weight:600;font-size:10px">▶ Horas en período: ${h}h</span>`:''}
-        <a href="jira-horas-dashboard.html?key=${c.key}" target="_blank" rel="noopener" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--ac)">Detalle por consultor/mes →</a>
+        <a href="jira-horas-dashboard.html?key=${c.key}" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--ac)">Detalle por consultor/mes →</a>
       </div>`;
       if(byC.length>0) {
         const maxCH=byC[0].hours;
