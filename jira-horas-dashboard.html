@@ -4,46 +4,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#ECF1F9; --sf:#FFF; --sf2:#F4F7FC; --bd:#CDD8EC;
-  --ac:#1B63CF; --ac-s:#D6E5FA;
-  --t1:#0C1929; --t2:#4A5B74; --t3:#8294AE;
-  --dn-f:#1A9E5E; --dn-b:#E2F5EC;
-  --ip-f:#1B63CF; --ip-b:#E0EBFC;
-  --td-f:#7A8A9E; --td-b:#EDF1F6;
-  --sh:0 1px 4px rgba(12,25,41,.08);
-  --r:10px;
+  --jtc-navy:#11273C;--jtc-blue:#0278D2;--jtc-org:#FC5E32;--jtc-yel:#FFED00;
+  --bg:#EEF3F9;--sf:#FFFFFF;--sf2:#F5F8FC;--bd:#C8D4E0;
+  --ac:#0278D2;--ac-s:#DCF0FF;
+  --t1:#11273C;--t2:#3D5568;--t3:#7A90A4;
+  --dn-f:#1A9E5E;--dn-b:#E2F5EC;
+  --ip-f:#0278D2;--ip-b:#DCF0FF;
+  --td-f:#7A8A9E;--td-b:#EDF1F6;
+  --sh:0 1px 4px rgba(17,39,60,.08);--r:10px;
 }
-@media (prefers-color-scheme:dark) { :root {
-  --bg:#0A1220; --sf:#121D30; --sf2:#192438; --bd:#24354E;
-  --ac:#4A88EC; --ac-s:#0D1E40;
-  --t1:#E0EAF6; --t2:#8095B0; --t3:#506070;
-  --dn-f:#32BC72; --dn-b:#0A271E;
-  --ip-f:#4A88EC; --ip-b:#0C1F3E;
-  --td-f:#8A97AF; --td-b:#192438;
-  --sh:0 1px 4px rgba(0,0,0,.28);
+@media(prefers-color-scheme:dark){:root{
+  --bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;
+  --ac:#2E90E0;--ac-s:#0F2040;--t1:#E0EAF6;--t2:#8095B0;--t3:#506070;
+  --dn-f:#32BC72;--dn-b:#0A271E;
+  --ip-f:#2E90E0;--ip-b:#0F2040;
+  --td-f:#8A97AF;--td-b:#1A3050;
+  --sh:0 1px 4px rgba(0,0,0,.35);
 }}
-:root[data-theme=light] {
-  --bg:#ECF1F9; --sf:#FFF; --sf2:#F4F7FC; --bd:#CDD8EC;
-  --ac:#1B63CF; --ac-s:#D6E5FA;
-  --t1:#0C1929; --t2:#4A5B74; --t3:#8294AE;
-  --dn-f:#1A9E5E; --dn-b:#E2F5EC;
-  --ip-f:#1B63CF; --ip-b:#E0EBFC;
-  --td-f:#7A8A9E; --td-b:#EDF1F6;
-  --sh:0 1px 4px rgba(12,25,41,.08);
-}
-:root[data-theme=dark] {
-  --bg:#0A1220; --sf:#121D30; --sf2:#192438; --bd:#24354E;
-  --ac:#4A88EC; --ac-s:#0D1E40;
-  --t1:#E0EAF6; --t2:#8095B0; --t3:#506070;
-  --dn-f:#32BC72; --dn-b:#0A271E;
-  --ip-f:#4A88EC; --ip-b:#0C1F3E;
-  --td-f:#8A97AF; --td-b:#192438;
-  --sh:0 1px 4px rgba(0,0,0,.28);
-}
+:root[data-theme=light]{--bg:#EEF3F9;--sf:#FFF;--sf2:#F5F8FC;--bd:#C8D4E0;--ac:#0278D2;--ac-s:#DCF0FF;--t1:#11273C;--t2:#3D5568;--t3:#7A90A4;--sh:0 1px 4px rgba(17,39,60,.08);--dn-f:#1A9E5E;--dn-b:#E2F5EC;--ip-f:#0278D2;--ip-b:#DCF0FF;--td-f:#7A8A9E;--td-b:#EDF1F6;}
+:root[data-theme=dark]{--bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;--ac:#2E90E0;--ac-s:#0F2040;--t1:#E0EAF6;--t2:#8095B0;--t3:#506070;--sh:0 1px 4px rgba(0,0,0,.35);--dn-f:#32BC72;--dn-b:#0A271E;--ip-f:#2E90E0;--ip-b:#0F2040;--td-f:#8A97AF;--td-b:#1A3050;}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5;padding:20px}
-.wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5}
+
+/* BRAND HEADER */
+.brand-hdr{background:var(--jtc-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand-logo{display:flex;align-items:baseline;gap:8px}
+.brand-jtc{color:#FFF;font-size:22px;font-weight:800;letter-spacing:.08em}
+.brand-tag{color:rgba(255,255,255,.55);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em}
+.brand-title{color:rgba(255,255,255,.9);font-size:14px;font-weight:500;border-left:1px solid rgba(255,255,255,.2);padding-left:16px}
+.brand-sub{color:rgba(255,255,255,.45);font-size:11px;margin-top:2px}
+.brand-theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;white-space:nowrap;font-family:inherit}
+.brand-theme-btn:hover{color:#fff;background:rgba(255,255,255,.18)}
+
+.wrap{max-width:1000px;margin:0 auto;padding:18px 18px 30px;display:flex;flex-direction:column;gap:12px}
 
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:20px}
 .card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:14px}
@@ -58,12 +52,10 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .search-btn:disabled{opacity:.6;cursor:default}
 .search-status{font-size:12px;color:var(--t3);flex-basis:100%}
 .search-status.err{color:#D94520;font-weight:600}
-.theme-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;flex-shrink:0}
-.theme-btn:hover{color:var(--t1)}
-.back-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--t2);cursor:pointer;flex-shrink:0;text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.back-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:9px 14px;font-size:11px;color:var(--t2);cursor:pointer;flex-shrink:0;text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-weight:600}
 .back-btn:hover{color:var(--ac);border-color:var(--ac)}
 
-/* HEADER */
+/* CASE HEADER */
 .hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .issue-key{font-family:'Consolas','Courier New',monospace;font-size:12px;font-weight:700;color:var(--ac);letter-spacing:.04em}
 .issue-title{font-size:20px;font-weight:700;color:var(--t1);margin:3px 0 10px;text-wrap:balance}
@@ -84,27 +76,51 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .kpi-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-top:5px}
 .kpi-sub{font-size:10px;color:var(--t3);margin-top:3px}
 
-/* LINKED ISSUE CARD */
-.li-hdr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.li-key{font-family:'Consolas','Courier New',monospace;font-weight:700;font-size:13px;color:var(--ac)}
-.li-summ{font-size:12px;color:var(--t2);margin-left:8px}
-.li-tot{font-size:13px;font-weight:700;color:var(--t1);font-variant-numeric:tabular-nums}
+/* FILTERS (mismos que live.html) */
+.filter-card{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;padding:14px 20px}
+.f-section{display:flex;flex-direction:column;gap:6px}
+.f-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)}
+.f-select{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--t1);font-family:inherit;min-width:180px;cursor:pointer;outline:none}
+.f-select:focus{border-color:var(--ac)}
+.f-input{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--t1);font-family:inherit;width:136px;cursor:pointer;outline:none}
+.f-input:focus{border-color:var(--ac)}
+.f-input.active-date{border-color:var(--jtc-org);background:rgba(252,94,50,.06)}
+.date-pair{display:flex;gap:8px;align-items:center}
+.date-sep{font-size:11px;color:var(--t3)}
+.clear-btn{background:var(--jtc-org);border:none;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;display:none;font-family:inherit;white-space:nowrap}
+.clear-btn:hover{background:#D94520}
+.period-note{font-size:10px;color:var(--jtc-org);font-weight:600;margin-left:auto}
 
-/* MATRIX TABLE */
-.mx-wrap{overflow-x:auto}
-table.mx{border-collapse:collapse;width:100%;font-size:12px}
-table.mx th,table.mx td{padding:7px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--bd)}
-table.mx th:first-child,table.mx td:first-child{text-align:left;position:sticky;left:0;background:var(--sf)}
-table.mx thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:2px solid var(--bd)}
-table.mx tbody tr:hover td{background:var(--sf2)}
-table.mx td.zero{color:var(--t3)}
-table.mx tfoot td{font-weight:700;color:var(--t1);border-top:2px solid var(--bd);border-bottom:none}
-table.mx tfoot td:first-child{background:var(--sf)}
-.mx-name{color:var(--t1);font-weight:500}
+/* MONTH GROUPS */
+.month-block{margin-bottom:22px}
+.month-block:last-child{margin-bottom:0}
+.month-hdr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--bd)}
+.month-name{font-size:14px;font-weight:700;color:var(--t1)}
+.month-tot{font-size:14px;font-weight:800;color:var(--ac);font-variant-numeric:tabular-nums}
+.cons-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px}
+.cons-item:last-child{margin-bottom:0}
+.cons-name{width:260px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.cons-issue{font-family:'Consolas','Courier New',monospace;font-weight:700;font-size:11px;color:var(--ac);margin-right:6px}
+.cons-bar{flex:1;height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
+.cons-fill{height:100%;border-radius:3px;background:var(--ac);width:0;transition:width .8s cubic-bezier(.4,0,.2,1) .05s}
+.cons-h{width:44px;font-variant-numeric:tabular-nums;font-weight:700;font-size:11px;color:var(--t2);text-align:right;flex-shrink:0}
 
 .empty-state{padding:32px;text-align:center;color:var(--t3);font-size:14px}
 .empty-state strong{display:block;font-size:18px;margin-bottom:6px;color:var(--t2)}
 </style>
+
+<!-- BRAND HEADER -->
+<div class="brand-hdr">
+  <div class="brand-logo">
+    <span class="brand-jtc">JTC</span>
+    <span class="brand-tag">just time consulting group</span>
+  </div>
+  <div class="brand-title">
+    Detalle de Caso · Consumo de Horas
+    <div class="brand-sub">Horas por mes y consultor, por issue vinculada</div>
+  </div>
+  <button class="brand-theme-btn" onclick="toggleTheme()">◑ Tema</button>
+</div>
 
 <div class="wrap">
 
@@ -113,7 +129,6 @@ table.mx tfoot td:first-child{background:var(--sf)}
     <a class="back-btn" href="live.html">← Volver</a>
     <input class="search-input" id="key-input" placeholder="Ej: ATIHD-50" autocomplete="off" spellcheck="false">
     <button class="search-btn" id="search-btn" onclick="runSearch()">Buscar</button>
-    <button class="theme-btn" onclick="toggleTheme()">◑ Tema</button>
     <div class="search-status" id="search-status"></div>
   </div>
 
@@ -131,6 +146,7 @@ const STATUS_CAT = {
 const MONTH_NAMES = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
 let CASE = null;
+let filterPeriod='', filterDateFrom='', filterDateTo='';
 
 function statusCat(s) { return STATUS_CAT[s] || 'todo'; }
 function monthLabel(m) { const [y, mo] = m.split('-'); return `${MONTH_NAMES[parseInt(mo,10)]} ${y}`; }
@@ -139,6 +155,7 @@ function fmtDate(d) {
   const [y,m,day] = d.split('-');
   return `${parseInt(day,10)} ${MONTH_NAMES[parseInt(m,10)]} ${y}`;
 }
+function round2(n) { return Math.round(n * 100) / 100; }
 
 function dark() {
   const t = document.documentElement.getAttribute('data-theme');
@@ -148,71 +165,112 @@ function toggleTheme() {
   document.documentElement.setAttribute('data-theme', dark() ? 'light' : 'dark');
 }
 
-/* Agrupa worklogs de un issue vinculado en matriz consultor x mes */
-function buildMatrix(worklogs) {
-  const months = [...new Set(worklogs.map(w => w.date.slice(0, 7)))].sort();
-  const consultants = [...new Set(worklogs.map(w => w.consultant))];
-  const grid = {};
-  consultants.forEach(c => { grid[c] = {}; months.forEach(m => grid[c][m] = 0); });
-  worklogs.forEach(w => { grid[w.consultant][w.date.slice(0,7)] = (grid[w.consultant][w.date.slice(0,7)] || 0) + w.hours; });
+/* ── WORKLOGS FLATTENED (con issueKey de origen) ─────────── */
+function allEntries() {
+  if (!CASE) return [];
+  return CASE.linked.flatMap(li => li.worklogs.map(w => ({ ...w, issueKey: li.key })));
+}
+function getFiltered() {
+  const entries = allEntries();
+  if (!filterDateFrom && !filterDateTo) return entries;
+  return entries.filter(e => {
+    if (filterDateFrom && e.date < filterDateFrom) return false;
+    if (filterDateTo   && e.date > filterDateTo)   return false;
+    return true;
+  });
+}
+function dateActive() { return !!(filterDateFrom || filterDateTo); }
 
-  const rows = consultants.map(c => {
-    const total = months.reduce((s, m) => s + grid[c][m], 0);
-    return { consultant: c, total: Math.round(total * 100) / 100, byMonth: grid[c] };
-  }).sort((a, b) => b.total - a.total);
-
-  const colTotals = {};
-  months.forEach(m => { colTotals[m] = Math.round(rows.reduce((s, r) => s + r.byMonth[m], 0) * 100) / 100; });
-  const grandTotal = Math.round(months.reduce((s, m) => s + colTotals[m], 0) * 100) / 100;
-
-  return { months, rows, colTotals, grandTotal };
+/* ── PERIODOS (mismo cálculo que live.html) ──────────────── */
+function getAvailablePeriods() {
+  const months = new Set();
+  allEntries().forEach(e => months.add(e.date.slice(0, 7)));
+  return [...months].sort().reverse();
+}
+function periodToDateRange(p) {
+  const [y, m] = p.split('-').map(Number);
+  const from = `${y}-${String(m).padStart(2,'0')}-01`;
+  const last = new Date(y, m, 0).getDate();
+  return { from, to: `${y}-${String(m).padStart(2,'0')}-${last}` };
 }
 
-function renderMatrix(li) {
-  const { months, rows, colTotals, grandTotal } = buildMatrix(li.worklogs);
-  if (rows.length === 0) {
-    return `<div class="li-hdr">
-      <div><span class="li-key"><a href="${JIRA}${li.key}" target="_blank" rel="noopener">${li.key}</a></span><span class="li-summ">${li.summary}</span></div>
-      <span class="li-tot">0h</span>
+/* ── AGRUPACIÓN: primero por mes, luego por consultor (+ issue de origen) ── */
+function groupByMonthThenConsultant(entries) {
+  const byMonth = {};
+  entries.forEach(e => {
+    const m = e.date.slice(0, 7);
+    (byMonth[m] = byMonth[m] || []).push(e);
+  });
+  const months = Object.keys(byMonth).sort().reverse();
+  return months.map(m => {
+    const monthEntries = byMonth[m];
+    const total = round2(monthEntries.reduce((s, e) => s + e.hours, 0));
+    const byIC = {};
+    monthEntries.forEach(e => {
+      const k = e.issueKey + '|' + e.consultant;
+      if (!byIC[k]) byIC[k] = { issueKey: e.issueKey, consultant: e.consultant, hours: 0 };
+      byIC[k].hours += e.hours;
+    });
+    const rows = Object.values(byIC).sort((a, b) => b.hours - a.hours).map(r => ({ ...r, hours: round2(r.hours) }));
+    return { month: m, total, rows };
+  });
+}
+
+/* ── FILTER UI ────────────────────────────────────────────── */
+function renderFilters() {
+  const wrap = document.getElementById('filters');
+  if (!wrap) return;
+  const periods = getAvailablePeriods();
+  wrap.innerHTML = `
+    <div class="f-section">
+      <div class="f-label">Período (horas cargadas)</div>
+      <select class="f-select" id="period-filter">
+        <option value="">Todos los períodos</option>
+        ${periods.map(p => `<option value="${p}" ${p===filterPeriod?'selected':''}>${monthLabel(p)}</option>`).join('')}
+      </select>
     </div>
-    <div style="font-size:12px;color:var(--t3)">Sin horas registradas.</div>`;
-  }
-  return `<div class="li-hdr">
-    <div><span class="li-key"><a href="${JIRA}${li.key}" target="_blank" rel="noopener">${li.key}</a></span><span class="li-summ">${li.summary} · ${li.status}</span></div>
-    <span class="li-tot">${grandTotal}h</span>
-  </div>
-  <div class="mx-wrap">
-    <table class="mx">
-      <thead><tr>
-        <th>Consultor</th>
-        ${months.map(m => `<th>${monthLabel(m)}</th>`).join('')}
-        <th>Total</th>
-      </tr></thead>
-      <tbody>
-        ${rows.map(r => `<tr>
-          <td class="mx-name">${r.consultant}</td>
-          ${months.map(m => { const h = r.byMonth[m]; return `<td class="${h===0?'zero':''}">${h===0?'—':h}</td>`; }).join('')}
-          <td><strong>${r.total}</strong></td>
-        </tr>`).join('')}
-      </tbody>
-      <tfoot><tr>
-        <td>Total mes</td>
-        ${months.map(m => `<td>${colTotals[m]}</td>`).join('')}
-        <td>${grandTotal}</td>
-      </tr></tfoot>
-    </table>
-  </div>`;
+    <div class="f-section">
+      <div class="f-label">Rango de fechas (worklogs)</div>
+      <div class="date-pair">
+        <input type="date" class="f-input${filterDateFrom?' active-date':''}" id="date-from" value="${filterDateFrom}">
+        <span class="date-sep">—</span>
+        <input type="date" class="f-input${filterDateTo?' active-date':''}" id="date-to" value="${filterDateTo}">
+      </div>
+    </div>
+    <button class="clear-btn" id="clear-btn" style="display:${(filterPeriod||filterDateFrom||filterDateTo)?'block':'none'}">✕ Limpiar filtros</button>
+    ${dateActive() ? '<span class="period-note">Horas filtradas por fecha de carga</span>' : ''}
+  `;
+  document.getElementById('period-filter').onchange = e => {
+    const p = e.target.value;
+    filterPeriod = p;
+    if (p) { const { from, to } = periodToDateRange(p); filterDateFrom = from; filterDateTo = to; }
+    else { filterDateFrom = ''; filterDateTo = ''; }
+    renderFilters(); renderContent();
+  };
+  document.getElementById('date-from').onchange = e => { filterDateFrom = e.target.value; syncPeriodFromDates(); renderFilters(); renderContent(); };
+  document.getElementById('date-to').onchange   = e => { filterDateTo   = e.target.value; syncPeriodFromDates(); renderFilters(); renderContent(); };
+  document.getElementById('clear-btn').onclick  = () => { filterPeriod=''; filterDateFrom=''; filterDateTo=''; renderFilters(); renderContent(); };
+}
+function syncPeriodFromDates() {
+  filterPeriod = '';
+  getAvailablePeriods().forEach(p => {
+    const { from, to } = periodToDateRange(p);
+    if (from === filterDateFrom && to === filterDateTo) filterPeriod = p;
+  });
 }
 
-function render() {
+/* ── RENDER PRINCIPAL ─────────────────────────────────────── */
+function renderContent() {
   const content = document.getElementById('content');
   if (!CASE) { content.innerHTML = ''; return; }
 
-  const allWorklogs = CASE.linked.flatMap(li => li.worklogs);
-  const totalHours = Math.round(allWorklogs.reduce((s, w) => s + w.hours, 0) * 100) / 100;
-  const consultants = new Set(allWorklogs.map(w => w.consultant));
-  const withHours = CASE.linked.filter(li => li.worklogs.length > 0).length;
+  const filtered = getFiltered();
+  const totalHours = round2(filtered.reduce((s, w) => s + w.hours, 0));
+  const consultants = new Set(filtered.map(w => w.consultant));
+  const issuesConHoras = new Set(filtered.map(w => w.issueKey)).size;
   const cat = statusCat(CASE.status);
+  const groups = groupByMonthThenConsultant(filtered);
+  const pActive = dateActive();
 
   content.innerHTML = `
     <div class="card">
@@ -233,30 +291,56 @@ function render() {
     <div class="kpi-grid">
       <div class="kpi">
         <div class="kpi-n ac">${totalHours}h</div>
-        <div class="kpi-l">Horas consumidas</div>
+        <div class="kpi-l">${pActive ? 'Horas en período' : 'Horas consumidas'}</div>
       </div>
       <div class="kpi">
-        <div class="kpi-n">${CASE.linked.length}</div>
+        <div class="kpi-n">${issuesConHoras}</div>
         <div class="kpi-l">Issues vinculadas</div>
-        <div class="kpi-sub">${withHours} con horas registradas</div>
+        <div class="kpi-sub">${CASE.linked.length} en total · con horas ${pActive ? 'en período' : 'registradas'}</div>
       </div>
       <div class="kpi">
         <div class="kpi-n">${consultants.size}</div>
         <div class="kpi-l">Consultores activos</div>
       </div>
       <div class="kpi">
-        <div class="kpi-n">${[...new Set(allWorklogs.map(w=>w.date.slice(0,7)))].length}</div>
+        <div class="kpi-n">${groups.length}</div>
         <div class="kpi-l">Meses con actividad</div>
       </div>
     </div>
 
+    <div class="card filter-card" id="filters"></div>
+
     <div class="card">
-      <div class="card-title">Horas por consultor y mes — por issue vinculada</div>
-      ${CASE.linked.length === 0
-        ? '<div style="font-size:12px;color:var(--t3)">Este caso no tiene issues vinculadas.</div>'
-        : CASE.linked.map((li, i) => `<div style="${i>0?'margin-top:22px;padding-top:18px;border-top:1px solid var(--bd)':''}">${renderMatrix(li)}</div>`).join('')}
+      <div class="card-title">Horas por mes y consultor</div>
+      ${groups.length === 0
+        ? '<div class="empty-state"><strong>Sin datos</strong>No hay horas registradas en el rango seleccionado.</div>'
+        : groups.map(g => `
+          <div class="month-block">
+            <div class="month-hdr">
+              <span class="month-name">${monthLabel(g.month)}</span>
+              <span class="month-tot">${g.total}h</span>
+            </div>
+            ${g.rows.map(r => {
+              const maxH = g.rows[0].hours || 1;
+              return `<div class="cons-item">
+                <span class="cons-name"><span class="cons-issue">${r.issueKey}</span>${r.consultant}</span>
+                <div class="cons-bar"><div class="cons-fill" data-w="${(r.hours/maxH*100).toFixed(1)}%"></div></div>
+                <span class="cons-h">${r.hours}h</span>
+              </div>`;
+            }).join('')}
+          </div>`).join('')}
     </div>
   `;
+  renderFilters();
+  animateBars();
+}
+
+function animateBars() {
+  requestAnimationFrame(() => {
+    document.querySelectorAll('[data-w]').forEach(el => {
+      setTimeout(() => { el.style.width = el.dataset.w; }, 60);
+    });
+  });
 }
 
 async function runSearch() {
@@ -280,12 +364,13 @@ async function runSearch() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Error desconocido');
     CASE = data;
+    filterPeriod=''; filterDateFrom=''; filterDateTo='';
     status.className = '';
     status.textContent = '';
-    render();
+    renderContent();
   } catch (err) {
     CASE = null;
-    render();
+    renderContent();
     status.className = 'search-status err';
     status.textContent = 'Error: ' + err.message;
   } finally {
