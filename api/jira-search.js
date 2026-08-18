@@ -92,16 +92,18 @@ async function getAllWorklogs(issueKey) {
 function extractLinks(issue) {
   const links = issue.fields.issuelinks || [];
   const keys = new Set();
-  const statuses = {};
+  const ftStatuses = {};
   links.forEach(link => {
     const linked = link.outwardIssue || link.inwardIssue;
     if (linked) {
       keys.add(linked.key);
-      const st = linked.fields?.status?.name || 'Desconocido';
-      statuses[st] = (statuses[st] || 0) + 1;
+      if (/FT-\d+$/.test(linked.key)) {
+        const st = linked.fields?.status?.name || 'Desconocido';
+        ftStatuses[st] = (ftStatuses[st] || 0) + 1;
+      }
     }
   });
-  return { keys: [...keys], statuses };
+  return { keys: [...keys], statuses: ftStatuses };
 }
 
 module.exports = async (req, res) => {
