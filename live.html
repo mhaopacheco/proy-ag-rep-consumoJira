@@ -102,8 +102,11 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .tbl-count{font-size:11px;color:var(--t3)}
 
 .tbl-wrap{overflow-x:auto}
-.trow{display:grid;grid-template-columns:82px 1fr 148px 88px 90px 78px 90px 34px 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.trow{display:grid;grid-template-columns:82px 1fr 148px 88px 90px 78px 74px 60px 34px 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
 .t-est{font-variant-numeric:tabular-nums;color:var(--t2)}
+.t-diff{font-weight:700;font-variant-numeric:tabular-nums}
+.sem-wrap{display:flex;justify-content:center}
+.sem-dot{width:14px;height:14px;border-radius:50%;display:inline-block}
 .trow:last-child{border-bottom:none}
 .thd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:4px 0 6px}
 @media(max-width:760px){.trow{grid-template-columns:78px 1fr 140px 65px 30px 28px}.t-hide{display:none}}
@@ -115,8 +118,6 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .t-h.period-h{color:var(--jtc-org)}
 .t-zero{color:var(--t3)}
 .t-vc{font-variant-numeric:tabular-nums;color:var(--t2);text-align:center}
-.mini-track{height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
-.mini-fill{height:100%;border-radius:3px;width:0;transition:width .9s cubic-bezier(.4,0,.2,1) .08s}
 .tog-btn{background:none;border:1px solid var(--bd);border-radius:5px;width:25px;height:22px;cursor:pointer;color:var(--t3);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
 .tog-btn:hover{color:var(--t1);border-color:var(--t2)}
 .tog-btn.open{background:var(--ac-s);border-color:var(--ac);color:var(--ac)}
@@ -269,7 +270,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
         <span class="t-hide">Tipo</span>
         <span class="t-hide">Estimación Total</span>
         <span id="col-h-label">Horas</span>
-        <span class="t-hide">Progreso</span>
+        <span class="t-hide">Diferencia</span>
+        <span class="t-hide" style="text-align:center">Progreso</span>
         <span style="text-align:center">Vinc.</span>
         <span></span>
       </div>
@@ -479,6 +481,24 @@ function sc(status) {
 function tc(tipo) {
   const cfg=colorFor(tipo, tipoColorCache, TIPO_COLORS);
   return dark()?{fg:cfg.dc,bg:cfg.bgd}:{fg:cfg.lc,bg:cfg.bgl};
+}
+
+/* ── SEMÁFORO: Estimación Total − Horas ──────────── */
+function estDiff(c) {
+  if (c.estimacionTotal === '' || c.estimacionTotal == null) return null;
+  return Math.round((Number(c.estimacionTotal) - sumHours(getWorklogs(c.key))) * 100) / 100;
+}
+function semaphoreColor(diff) {
+  if (diff === null) return dark() ? '#3D5568' : '#C8D4E0';
+  if (diff < 0) return dark() ? '#F0785A' : '#D94520';
+  if (diff < 4) return dark() ? '#D4940A' : '#A86500';
+  return dark() ? '#32BC72' : '#1A9A5A';
+}
+function semaphoreTitle(diff) {
+  if (diff === null) return 'Sin estimación total';
+  if (diff < 0) return `Excede la estimación por ${Math.abs(diff)}h`;
+  if (diff < 4) return `Margen ajustado: ${diff}h restantes`;
+  return `Margen amplio: ${diff}h restantes`;
 }
 
 /* ── PERIODS ─────────────────────────────────────── */
@@ -709,7 +729,6 @@ function renderCases() {
   body.innerHTML='';
 
   const pActive=dateActive();
-  const maxH=filtered.length>0 ? Math.max(...filtered.map(c=>sumHours(getWorklogs(c.key))),1) : 1;
 
   if(filtered.length===0) {
     const d=document.createElement('div');
@@ -725,8 +744,9 @@ function renderCases() {
     const t=tc(c.tipoActividad);
     const entries=getWorklogs(c.key);
     const h=sumHours(entries);
-    const pct=(h/maxH*100).toFixed(1);
     const isOpen=expanded.has(c.key);
+    const diff=estDiff(c);
+    const semColor=semaphoreColor(diff);
 
     const row=document.createElement('div');
     row.className='trow';
@@ -737,7 +757,8 @@ function renderCases() {
       <span class="t-hide">${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}</span>
       <span class="t-hide t-est">${c.estimacionTotal!==''&&c.estimacionTotal!=null?c.estimacionTotal+'h':'—'}</span>
       <span class="${h>0?(pActive?'t-h period-h':'t-h'):'t-zero'}">${h>0?h+'h':'—'}</span>
-      <div class="t-hide mini-track"><div class="mini-fill" style="background:${pActive?'#FC5E32':s.fg}" data-w="${pct}%"></div></div>
+      <span class="t-hide t-diff" style="color:${semColor}">${diff===null?'—':(diff>0?'+':'')+diff+'h'}</span>
+      <div class="t-hide sem-wrap" title="${semaphoreTitle(diff)}"><span class="sem-dot" style="background:${semColor}"></span></div>
       <span class="t-vc">${c.linkedCount||'—'}</span>
       <button class="tog-btn${isOpen?' open':''}" data-key="${c.key}">${isOpen?'▲':'▼'}</button>`;
     body.appendChild(row);
