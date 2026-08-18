@@ -104,6 +104,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .cons-bar{flex:1;height:6px;background:var(--sf2);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
 .cons-fill{height:100%;border-radius:3px;background:var(--ac);width:0;transition:width .8s cubic-bezier(.4,0,.2,1) .05s}
 .cons-h{width:44px;font-variant-numeric:tabular-nums;font-weight:700;font-size:11px;color:var(--t2);text-align:right;flex-shrink:0}
+.cons-status{width:120px;flex-shrink:0;display:flex;justify-content:flex-end}
 
 .empty-state{padding:32px;text-align:center;color:var(--t3);font-size:14px}
 .empty-state strong{display:block;font-size:18px;margin-bottom:6px;color:var(--t2)}
@@ -271,6 +272,8 @@ function renderContent() {
   const cat = statusCat(CASE.status);
   const groups = groupByMonthThenConsultant(filtered);
   const pActive = dateActive();
+  const issueStatusMap = {};
+  CASE.linked.forEach(li => { issueStatusMap[li.key] = li.status; });
 
   content.innerHTML = `
     <div class="card">
@@ -322,10 +325,13 @@ function renderContent() {
             </div>
             ${g.rows.map(r => {
               const maxH = g.rows[0].hours || 1;
+              const liStatus = issueStatusMap[r.issueKey] || '';
+              const liCat = statusCat(liStatus);
               return `<div class="cons-item">
                 <span class="cons-name"><span class="cons-issue">${r.issueKey}</span>${r.consultant}</span>
                 <div class="cons-bar"><div class="cons-fill" data-w="${(r.hours/maxH*100).toFixed(1)}%"></div></div>
                 <span class="cons-h">${r.hours}h</span>
+                <span class="cons-status">${liStatus?`<span class="pill ${liCat}">${liStatus}</span>`:''}</span>
               </div>`;
             }).join('')}
           </div>`).join('')}

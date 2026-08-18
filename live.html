@@ -9,6 +9,8 @@
   --ac:#0278D2;--ac-s:#DCF0FF;
   --t1:#11273C;--t2:#3D5568;--t3:#7A90A4;
   --sh:0 1px 4px rgba(17,39,60,.08);--r:10px;
+  --cw-caso:82px;--cw-resumen:300px;--cw-estado:148px;--cw-tipo:88px;--cw-est:90px;
+  --cw-horas:78px;--cw-diff:74px;--cw-prog:60px;--cw-vinc:50px;--cw-vincst:130px;
 }
 @media(prefers-color-scheme:dark){:root{
   --bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;
@@ -94,15 +96,20 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .period-note{font-size:10px;color:var(--jtc-org);font-weight:600;text-align:right;white-space:nowrap}
 
 .sort-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between}
-.sort-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.sort-lbl{font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.sort-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--t2);cursor:pointer;font-family:inherit}
-.sort-btn.active{background:var(--ac-s);border-color:var(--ac);color:var(--ac);font-weight:600}
-.sort-btn:hover:not(.active){color:var(--t1)}
+.sort-lbl{font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.02em}
 .tbl-count{font-size:11px;color:var(--t3)}
 
 .tbl-wrap{overflow-x:auto}
-.trow{display:grid;grid-template-columns:82px 1fr 148px 88px 90px 78px 74px 60px 34px 112px 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.trow{display:grid;grid-template-columns:var(--cw-caso) var(--cw-resumen) var(--cw-estado) var(--cw-tipo) var(--cw-est) var(--cw-horas) var(--cw-diff) var(--cw-prog) var(--cw-vinc) var(--cw-vincst) 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.th-cell{position:relative;display:flex;align-items:center;min-width:0}
+.th-cell.center{justify-content:center}
+.th-label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.th-label:hover{color:var(--t1)}
+.th-label.active{color:var(--ac)}
+.th-static{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sort-ind{font-size:8px;line-height:1;color:var(--ac);width:7px;display:inline-block}
+.col-resizer{position:absolute;top:-6px;right:-9px;width:11px;height:28px;cursor:col-resize;z-index:5;border-radius:3px}
+.col-resizer:hover,.col-resizer.resizing{background:var(--ac-s)}
 .t-est{font-variant-numeric:tabular-nums;color:var(--t2)}
 .t-diff{font-weight:700;font-variant-numeric:tabular-nums}
 .sem-wrap{display:flex;justify-content:center}
@@ -258,27 +265,21 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
   <!-- CASES TABLE -->
   <div class="card">
     <div class="sort-row">
-      <div class="sort-left">
-        <span class="sort-lbl">Ordenar:</span>
-        <button class="sort-btn active" id="sort-h" onclick="setSort('hours')">Horas ↓</button>
-        <button class="sort-btn" id="sort-d" onclick="setSort('date')">Actualizado ↓</button>
-        <button class="sort-btn" id="sort-s" onclick="setSort('status')">Estado</button>
-        <button class="sort-btn" id="sort-t" onclick="setSort('tipo')">Tipo</button>
-      </div>
+      <span class="sort-lbl">Click en un título para ordenar · arrastra el borde para ajustar el ancho</span>
       <span class="tbl-count" id="tbl-count"></span>
     </div>
     <div class="tbl-wrap">
       <div class="trow thd">
-        <span>Caso</span>
-        <span>Resumen</span>
-        <span>Estado</span>
-        <span class="t-hide">Tipo</span>
-        <span class="t-hide">Estimación Total</span>
-        <span id="col-h-label">Horas</span>
-        <span class="t-hide">Diferencia</span>
-        <span class="t-hide" style="text-align:center">Progreso</span>
-        <span style="text-align:center">Vinc.</span>
-        <span class="t-hide" style="text-align:center">Estado vinculadas</span>
+        <span class="th-cell" data-col="caso"><span class="th-label" data-col="caso">Caso<span class="sort-ind" data-col="caso"></span></span><span class="col-resizer" data-col="caso"></span></span>
+        <span class="th-cell" data-col="resumen"><span class="th-label" data-col="resumen">Resumen<span class="sort-ind" data-col="resumen"></span></span><span class="col-resizer" data-col="resumen"></span></span>
+        <span class="th-cell" data-col="estado"><span class="th-label" data-col="estado">Estado<span class="sort-ind" data-col="estado"></span></span><span class="col-resizer" data-col="estado"></span></span>
+        <span class="th-cell t-hide" data-col="tipo"><span class="th-label" data-col="tipo">Tipo<span class="sort-ind" data-col="tipo"></span></span><span class="col-resizer" data-col="tipo"></span></span>
+        <span class="th-cell t-hide" data-col="est"><span class="th-label" data-col="est">Estimación Total<span class="sort-ind" data-col="est"></span></span><span class="col-resizer" data-col="est"></span></span>
+        <span class="th-cell" data-col="horas"><span class="th-label" data-col="horas"><span id="col-h-label-text">Horas</span><span class="sort-ind" data-col="horas"></span></span><span class="col-resizer" data-col="horas"></span></span>
+        <span class="th-cell t-hide" data-col="diff"><span class="th-label" data-col="diff">Diferencia<span class="sort-ind" data-col="diff"></span></span><span class="col-resizer" data-col="diff"></span></span>
+        <span class="th-cell t-hide center" data-col="prog"><span class="th-static">Progreso</span><span class="col-resizer" data-col="prog"></span></span>
+        <span class="th-cell center" data-col="vinc"><span class="th-label" data-col="vinc">Vinc.<span class="sort-ind" data-col="vinc"></span></span><span class="col-resizer" data-col="vinc"></span></span>
+        <span class="th-cell t-hide center" data-col="vincst"><span class="th-label" data-col="vincst">Estado vinculadas<span class="sort-ind" data-col="vincst"></span></span><span class="col-resizer" data-col="vincst"></span></span>
         <span></span>
       </div>
       <div id="cases-body"></div>
@@ -319,7 +320,7 @@ const LINKED_COLORS = {'Finalizada':'#1A9A5A','Terminada':'#1A9A5A','En curso':'
 const JIRA = 'https://justtimeconsulting.atlassian.net/browse/';
 
 /* ── FILTER STATE ────────────────────────────────── */
-let sortBy='hours', filterStatus='', filterConsultant='', filterTipo='';
+let sortBy='horas', sortDir='desc', filterStatus='', filterConsultant='', filterTipo='';
 let filterPeriod='', filterDateFrom='', filterDateTo='';
 let expanded=new Set();
 
@@ -513,13 +514,17 @@ function ftCat(status) {
   if (/curso|progress|revis|desarroll|prueba/i.test(status)) return 'inprog';
   return 'todo';
 }
-function vincBadges(c) {
+function vincCounts(c) {
   const st = c.linkedStatuses || {};
   let done=0, inprog=0, todo=0;
   Object.entries(st).forEach(([name,ct])=>{
     const cat = ftCat(name);
     if (cat==='done') done+=ct; else if (cat==='inprog') inprog+=ct; else todo+=ct;
   });
+  return { done, inprog, todo };
+}
+function vincBadges(c) {
+  const { done, inprog, todo } = vincCounts(c);
   if (done+inprog+todo===0) return '<span class="t-zero" style="display:block;text-align:center">—</span>';
   return `<div class="vinc-badges" title="Por hacer: ${todo} · En progreso: ${inprog} · Finalizada: ${done}">
     ${todo?`<span class="vb todo">${todo}</span>`:''}
@@ -560,14 +565,32 @@ function getFiltered() {
     return true;
   });
 }
+function sortVal(c, col) {
+  switch(col) {
+    case 'caso':    return c.key;
+    case 'resumen': return c.summary || '';
+    case 'estado':  return c.status || '';
+    case 'tipo':    return c.tipoActividad || '';
+    case 'est':     return (c.estimacionTotal===''||c.estimacionTotal==null) ? null : Number(c.estimacionTotal);
+    case 'horas':   return sumHours(getWorklogs(c.key));
+    case 'diff':    return estDiff(c);
+    case 'vinc':    return c.linkedCount || 0;
+    case 'vincst':  { const v=vincCounts(c); return v.todo+v.inprog; }
+    default:        return 0;
+  }
+}
 function getSorted() {
   const a=[...CASES];
-  if(sortBy==='hours') {
-    return a.sort((x,y)=>sumHours(getWorklogs(y.key))-sumHours(getWorklogs(x.key)));
-  }
-  if(sortBy==='date')   return a.sort((x,y)=>y.updated.localeCompare(x.updated));
-  if(sortBy==='status') return a.sort((x,y)=>x.status.localeCompare(y.status));
-  if(sortBy==='tipo')   return a.sort((x,y)=>x.tipoActividad.localeCompare(y.tipoActividad));
+  a.sort((x,y)=>{
+    const vx=sortVal(x,sortBy), vy=sortVal(y,sortBy);
+    const xM = vx===null||vx===undefined||vx==='';
+    const yM = vy===null||vy===undefined||vy==='';
+    if(xM&&yM) return 0;
+    if(xM) return 1;
+    if(yM) return -1;
+    const cmp = typeof vx==='string' ? vx.localeCompare(vy) : vx-vy;
+    return sortDir==='asc' ? cmp : -cmp;
+  });
   return a;
 }
 
@@ -596,7 +619,7 @@ function updateKPIs() {
   document.getElementById('kpi-c').textContent=names.size;
   document.getElementById('kpi-c-sub').textContent=pActive?'activos en período':'con horas registradas';
 
-  const colH=document.getElementById('col-h-label');
+  const colH=document.getElementById('col-h-label-text');
   if(colH) colH.textContent=pActive?'Horas (período)':'Horas';
   const pNote=document.getElementById('period-note');
   if(pNote) pNote.style.display=pActive?'block':'none';
@@ -739,13 +762,19 @@ function updateClearAndCount() {
   } else { info.textContent=''; }
 }
 
-/* ── SORT ────────────────────────────────────────── */
-function setSort(s) {
-  sortBy=s;
-  ['h','d','s','t'].forEach(x=>{ const e=document.getElementById('sort-'+x); if(e) e.classList.remove('active'); });
-  const map={hours:'h',date:'d',status:'s',tipo:'t'};
-  const e=document.getElementById('sort-'+map[s]); if(e) e.classList.add('active');
-  renderCases();
+/* ── SORT (click en título de columna) ───────────── */
+function setSort(col) {
+  if (sortBy===col) sortDir = sortDir==='asc' ? 'desc' : 'asc';
+  else { sortBy=col; sortDir='desc'; }
+  update();
+}
+function renderSortIndicators() {
+  document.querySelectorAll('.th-label[data-col]').forEach(el=>{
+    const col = el.dataset.col;
+    const ind = el.querySelector('.sort-ind');
+    if (col===sortBy) { el.classList.add('active'); if(ind) ind.textContent = sortDir==='asc'?'▲':'▼'; }
+    else { el.classList.remove('active'); if(ind) ind.textContent=''; }
+  });
 }
 
 /* ── CASES TABLE ─────────────────────────────────── */
@@ -889,6 +918,7 @@ function update() {
   renderFilters();
   renderCases();
   renderRanking();
+  renderSortIndicators();
   saveState();
 }
 function renderAll() {
@@ -905,20 +935,68 @@ function saveState() {
     project: currentProject,
     filterStatus, filterConsultant, filterTipo,
     filterPeriod, filterDateFrom, filterDateTo,
-    sortBy,
+    sortBy, sortDir,
   }));
 }
 function loadState() {
   try { return JSON.parse(sessionStorage.getItem(STATE_KEY) || 'null'); }
   catch { return null; }
 }
-function applySortButtonClass(s) {
-  ['h','d','s','t'].forEach(x=>{ const e=document.getElementById('sort-'+x); if(e) e.classList.remove('active'); });
-  const map={hours:'h',date:'d',status:'s',tipo:'t'};
-  const e=document.getElementById('sort-'+map[s]); if(e) e.classList.add('active');
+
+/* ── COLUMNAS AJUSTABLES ──────────────────────────── */
+const COL_KEYS = ['caso','resumen','estado','tipo','est','horas','diff','prog','vinc','vincst'];
+const DEFAULT_COL_W = { caso:82, resumen:300, estado:148, tipo:88, est:90, horas:78, diff:74, prog:60, vinc:50, vincst:130 };
+const COL_W_KEY = 'jtc_col_widths';
+function loadColWidths() {
+  try { return JSON.parse(localStorage.getItem(COL_W_KEY) || 'null') || {}; }
+  catch { return {}; }
+}
+function applyColWidths() {
+  const saved = loadColWidths();
+  COL_KEYS.forEach(k => {
+    document.documentElement.style.setProperty(`--cw-${k}`, (saved[k]||DEFAULT_COL_W[k])+'px');
+  });
+}
+function saveColWidths() {
+  const obj = {};
+  COL_KEYS.forEach(k => {
+    obj[k] = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(`--cw-${k}`)) || DEFAULT_COL_W[k];
+  });
+  localStorage.setItem(COL_W_KEY, JSON.stringify(obj));
+}
+function initColResizers() {
+  document.querySelectorAll('.col-resizer').forEach(handle => {
+    handle.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const col = handle.dataset.col;
+      const startX = e.clientX;
+      const startW = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(`--cw-${col}`)) || DEFAULT_COL_W[col];
+      handle.classList.add('resizing');
+      function onMove(ev) {
+        const newW = Math.max(30, startW + (ev.clientX - startX));
+        document.documentElement.style.setProperty(`--cw-${col}`, newW+'px');
+      }
+      function onUp() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        handle.classList.remove('resizing');
+        saveColWidths();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
 }
 
+/* ── SORT: click delegado en encabezados ─────────── */
+document.querySelector('.trow.thd').addEventListener('click', e => {
+  const label = e.target.closest('.th-label');
+  if (label) setSort(label.dataset.col);
+});
+
 (function init() {
+  applyColWidths();
+  initColResizers();
   const saved = loadState();
   if (saved && saved.project) {
     document.getElementById('project-input').value = saved.project;
@@ -928,8 +1006,8 @@ function applySortButtonClass(s) {
     filterPeriod = saved.filterPeriod || '';
     filterDateFrom = saved.filterDateFrom || '';
     filterDateTo = saved.filterDateTo || '';
-    sortBy = saved.sortBy || 'hours';
-    applySortButtonClass(sortBy);
+    sortBy = saved.sortBy || 'horas';
+    sortDir = saved.sortDir || 'desc';
     runSearch(true);
   } else {
     renderAll();
