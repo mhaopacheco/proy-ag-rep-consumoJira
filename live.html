@@ -32,7 +32,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;white-space:nowrap;font-family:inherit}
 .theme-btn:hover{color:#fff;background:rgba(255,255,255,.18)}
 
-.wrap{max-width:1100px;margin:0 auto;padding:18px 18px 30px;display:flex;flex-direction:column;gap:12px}
+.wrap{max-width:1320px;margin:0 auto;padding:18px 18px 30px;display:flex;flex-direction:column;gap:12px}
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:18px 20px}
 .sect-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:12px}
 
@@ -99,6 +99,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .sort-lbl{font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.02em}
 .tbl-count{font-size:11px;color:var(--t3)}
 
+.tbl-scroll-top{overflow-x:auto;overflow-y:hidden;height:14px;margin-bottom:2px}
+.tbl-scroll-top-inner{height:1px}
 .tbl-wrap{overflow-x:auto}
 .trow{display:grid;grid-template-columns:var(--cw-caso) var(--cw-resumen) var(--cw-estado) var(--cw-tipo) var(--cw-est) var(--cw-horas) var(--cw-diff) var(--cw-prog) var(--cw-vinc) var(--cw-vincst) 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
 .th-cell{position:relative;display:flex;align-items:center;min-width:0}
@@ -268,7 +270,8 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
       <span class="sort-lbl">Click en un título para ordenar · arrastra el borde para ajustar el ancho</span>
       <span class="tbl-count" id="tbl-count"></span>
     </div>
-    <div class="tbl-wrap">
+    <div class="tbl-scroll-top" id="tbl-scroll-top"><div class="tbl-scroll-top-inner" id="tbl-scroll-top-inner"></div></div>
+    <div class="tbl-wrap" id="tbl-wrap">
       <div class="trow thd">
         <span class="th-cell" data-col="caso"><span class="th-label" data-col="caso">Caso<span class="sort-ind" data-col="caso"></span></span><span class="col-resizer" data-col="caso"></span></span>
         <span class="th-cell" data-col="resumen"><span class="th-label" data-col="resumen">Resumen<span class="sort-ind" data-col="resumen"></span></span><span class="col-resizer" data-col="resumen"></span></span>
@@ -903,6 +906,33 @@ function animateBars() {
       setTimeout(()=>{el.style.width=el.dataset.w;},60);
     });
   });
+  syncTopScrollWidth();
+}
+
+/* ── SCROLL SUPERIOR (espejo del scroll horizontal de la tabla) ── */
+function syncTopScrollWidth() {
+  const wrap = document.getElementById('tbl-wrap');
+  const inner = document.getElementById('tbl-scroll-top-inner');
+  if (!wrap || !inner) return;
+  const row = wrap.querySelector('.trow');
+  inner.style.width = (row ? row.scrollWidth : wrap.scrollWidth) + 'px';
+}
+function initTopScrollSync() {
+  const top = document.getElementById('tbl-scroll-top');
+  const wrap = document.getElementById('tbl-wrap');
+  if (!top || !wrap) return;
+  let syncing = false;
+  top.addEventListener('scroll', () => {
+    if (syncing) return; syncing = true;
+    wrap.scrollLeft = top.scrollLeft;
+    syncing = false;
+  });
+  wrap.addEventListener('scroll', () => {
+    if (syncing) return; syncing = true;
+    top.scrollLeft = wrap.scrollLeft;
+    syncing = false;
+  });
+  window.addEventListener('resize', syncTopScrollWidth);
 }
 
 /* ── THEME ───────────────────────────────────────── */
@@ -975,6 +1005,7 @@ function initColResizers() {
       function onMove(ev) {
         const newW = Math.max(30, startW + (ev.clientX - startX));
         document.documentElement.style.setProperty(`--cw-${col}`, newW+'px');
+        syncTopScrollWidth();
       }
       function onUp() {
         document.removeEventListener('mousemove', onMove);
@@ -997,6 +1028,7 @@ document.querySelector('.trow.thd').addEventListener('click', e => {
 (function init() {
   applyColWidths();
   initColResizers();
+  initTopScrollSync();
   const saved = loadState();
   if (saved && saved.project) {
     document.getElementById('project-input').value = saved.project;
