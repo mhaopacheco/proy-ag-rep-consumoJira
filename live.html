@@ -914,8 +914,7 @@ function syncTopScrollWidth() {
   const wrap = document.getElementById('tbl-wrap');
   const inner = document.getElementById('tbl-scroll-top-inner');
   if (!wrap || !inner) return;
-  const row = wrap.querySelector('.trow');
-  inner.style.width = (row ? row.scrollWidth : wrap.scrollWidth) + 'px';
+  inner.style.width = wrap.scrollWidth + 'px';
 }
 function initTopScrollSync() {
   const top = document.getElementById('tbl-scroll-top');
