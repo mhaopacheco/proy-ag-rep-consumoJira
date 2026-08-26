@@ -27,15 +27,6 @@ async function jiraFetch(path, options = {}) {
   return res.json();
 }
 
-let cachedActivityFieldId;
-async function findActivityFieldId() {
-  if (cachedActivityFieldId !== undefined) return cachedActivityFieldId;
-  const fields = await jiraFetch('/rest/api/3/field');
-  const match = fields.find(f => /tipo.*activ/i.test(f.name));
-  cachedActivityFieldId = match ? match.id : null;
-  return cachedActivityFieldId;
-}
-
 let cachedEstimationFieldId;
 async function findEstimationFieldId() {
   if (cachedEstimationFieldId !== undefined) return cachedEstimationFieldId;
@@ -45,9 +36,8 @@ async function findEstimationFieldId() {
   return cachedEstimationFieldId;
 }
 
-async function searchIssues(projectKey, activityFieldId, estimationFieldId, limit) {
-  const fieldsList = ['summary', 'status', 'created', 'updated', 'issuelinks'];
-  if (activityFieldId) fieldsList.push(activityFieldId);
+async function searchIssues(projectKey, estimationFieldId, limit) {
+  const fieldsList = ['summary', 'status', 'issuetype', 'created', 'updated', 'issuelinks'];
   if (estimationFieldId) fieldsList.push(estimationFieldId);
 
   let issues = [];
@@ -116,9 +106,8 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const activityFieldId = await findActivityFieldId();
     const estimationFieldId = await findEstimationFieldId();
-    const issues = await searchIssues(projectKey, activityFieldId, estimationFieldId, limit);
+    const issues = await searchIssues(projectKey, estimationFieldId, limit);
 
     const cases = [];
     const worklogData = {};
@@ -134,8 +123,7 @@ module.exports = async (req, res) => {
         const entries = ownWl.concat(...linkedWl).sort((a, b) => a.date.localeCompare(b.date));
         worklogData[key] = entries;
 
-        const tipoRaw = activityFieldId ? fields[activityFieldId] : null;
-        const tipoActividad = tipoRaw && typeof tipoRaw === 'object' ? tipoRaw.value : tipoRaw || '';
+        const tipoActividad = fields.issuetype?.name || '';
 
         const estRaw = estimationFieldId ? fields[estimationFieldId] : null;
         const estimacionTotal = estRaw && typeof estRaw === 'object' ? (estRaw.value ?? '') : (estRaw ?? '');
