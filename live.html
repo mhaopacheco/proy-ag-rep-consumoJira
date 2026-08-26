@@ -10,7 +10,7 @@
   --t1:#11273C;--t2:#3D5568;--t3:#7A90A4;
   --sh:0 1px 4px rgba(17,39,60,.08);--r:10px;
   --cw-caso:82px;--cw-resumen:300px;--cw-estado:148px;--cw-tipo:88px;--cw-est:90px;
-  --cw-horas:78px;--cw-diff:74px;--cw-prog:60px;--cw-vinc:50px;--cw-vincst:130px;
+  --cw-horas:78px;--cw-diff:74px;--cw-prog:60px;--cw-vincst:130px;
 }
 @media(prefers-color-scheme:dark){:root{
   --bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;
@@ -102,7 +102,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .tbl-scroll-top{overflow-x:auto;overflow-y:hidden;height:14px;margin-bottom:2px}
 .tbl-scroll-top-inner{height:1px}
 .tbl-wrap{overflow-x:auto}
-.trow{display:grid;grid-template-columns:var(--cw-caso) var(--cw-resumen) var(--cw-estado) var(--cw-tipo) var(--cw-est) var(--cw-horas) var(--cw-diff) var(--cw-prog) var(--cw-vinc) var(--cw-vincst) 30px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.trow{display:grid;grid-template-columns:30px var(--cw-caso) var(--cw-resumen) var(--cw-estado) var(--cw-tipo) var(--cw-est) var(--cw-horas) var(--cw-diff) var(--cw-prog) var(--cw-vincst);gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
 .th-cell{position:relative;display:flex;align-items:center;min-width:0}
 .th-cell.center{justify-content:center}
 .th-label{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -123,7 +123,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .vb.done{background:#1A9A5A}
 .trow:last-child{border-bottom:none}
 .thd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:4px 0 6px}
-@media(max-width:760px){.trow{grid-template-columns:78px 1fr 140px 65px 30px 28px}.t-hide{display:none}}
+@media(max-width:760px){.trow{grid-template-columns:28px 78px 1fr 140px 65px}.t-hide{display:none}}
 .t-key{font-family:'Courier New','Consolas',monospace;font-weight:700;font-size:11px;color:var(--ac)}
 .t-key a{color:inherit;text-decoration:none}
 .t-key a:hover{text-decoration:underline}
@@ -131,7 +131,6 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .t-h{font-weight:700;font-variant-numeric:tabular-nums;color:var(--t1)}
 .t-h.period-h{color:var(--jtc-org)}
 .t-zero{color:var(--t3)}
-.t-vc{font-variant-numeric:tabular-nums;color:var(--t2);text-align:center}
 .tog-btn{background:none;border:1px solid var(--bd);border-radius:5px;width:25px;height:22px;cursor:pointer;color:var(--t3);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
 .tog-btn:hover{color:var(--t1);border-color:var(--t2)}
 .tog-btn.open{background:var(--ac-s);border-color:var(--ac);color:var(--ac)}
@@ -226,9 +225,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
   <!-- FILTER BAR -->
   <div class="filter-card">
     <div class="filter-row">
-      <div class="f-section" style="flex:2;min-width:200px">
-        <div class="f-label">Estado</div>
-        <div class="fpills" id="status-filters"></div>
+      <div class="f-section" style="flex:1;min-width:220px">
+        <div class="f-label">Resumen</div>
+        <input type="text" class="f-input" style="width:100%" id="resumen-filter" placeholder="Buscar por caso o texto del resumen…" oninput="setResumenFilter(this.value)">
       </div>
       <div class="f-section" style="max-width:260px">
         <div class="f-label">Consultor</div>
@@ -236,9 +235,23 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
           <option value="">Todos los consultores</option>
         </select>
       </div>
-      <div class="f-section" style="flex:1;min-width:180px">
-        <div class="f-label">Tipo de actividad</div>
+    </div>
+    <div class="filter-row">
+      <div class="f-section" style="flex:1;min-width:260px">
+        <div class="f-label">Estado (uno o varios)</div>
+        <div class="fpills" id="status-filters"></div>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="f-section" style="flex:1;min-width:260px">
+        <div class="f-label">Tipo (uno o varios)</div>
         <div class="fpills" id="ta-filters"></div>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="f-section" style="flex:1;min-width:260px">
+        <div class="f-label">Estado vinculadas (uno o varios)</div>
+        <div class="fpills" id="vincst-filters"></div>
       </div>
     </div>
     <div class="filter-row" style="align-items:flex-end">
@@ -257,7 +270,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
         </div>
       </div>
       <div class="f-right">
-        <button class="clear-btn" id="clear-btn" onclick="clearFilters()">✕ Limpiar filtros</button>
+        <button class="clear-btn" id="clear-btn" onclick="clearFilters(true)">✕ Limpiar filtros</button>
         <div class="match-info" id="match-info"></div>
         <div class="period-note" id="period-note" style="display:none">Horas filtradas por fecha de carga</div>
       </div>
@@ -273,6 +286,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
     <div class="tbl-scroll-top" id="tbl-scroll-top"><div class="tbl-scroll-top-inner" id="tbl-scroll-top-inner"></div></div>
     <div class="tbl-wrap" id="tbl-wrap">
       <div class="trow thd">
+        <span></span>
         <span class="th-cell" data-col="caso"><span class="th-label" data-col="caso">Caso<span class="sort-ind" data-col="caso"></span></span><span class="col-resizer" data-col="caso"></span></span>
         <span class="th-cell" data-col="resumen"><span class="th-label" data-col="resumen">Resumen<span class="sort-ind" data-col="resumen"></span></span><span class="col-resizer" data-col="resumen"></span></span>
         <span class="th-cell" data-col="estado"><span class="th-label" data-col="estado">Estado<span class="sort-ind" data-col="estado"></span></span><span class="col-resizer" data-col="estado"></span></span>
@@ -281,9 +295,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
         <span class="th-cell" data-col="horas"><span class="th-label" data-col="horas"><span id="col-h-label-text">Horas</span><span class="sort-ind" data-col="horas"></span></span><span class="col-resizer" data-col="horas"></span></span>
         <span class="th-cell t-hide" data-col="diff"><span class="th-label" data-col="diff">Diferencia<span class="sort-ind" data-col="diff"></span></span><span class="col-resizer" data-col="diff"></span></span>
         <span class="th-cell t-hide center" data-col="prog"><span class="th-static">Progreso</span><span class="col-resizer" data-col="prog"></span></span>
-        <span class="th-cell center" data-col="vinc"><span class="th-label" data-col="vinc">Vinc.<span class="sort-ind" data-col="vinc"></span></span><span class="col-resizer" data-col="vinc"></span></span>
         <span class="th-cell t-hide center" data-col="vincst"><span class="th-label" data-col="vincst">Estado vinculadas<span class="sort-ind" data-col="vincst"></span></span><span class="col-resizer" data-col="vincst"></span></span>
-        <span></span>
       </div>
       <div id="cases-body"></div>
     </div>
@@ -323,7 +335,9 @@ const LINKED_COLORS = {'Finalizada':'#1A9A5A','Terminada':'#1A9A5A','En curso':'
 const JIRA = 'https://justtimeconsulting.atlassian.net/browse/';
 
 /* ── FILTER STATE ────────────────────────────────── */
-let sortBy='horas', sortDir='desc', filterStatus='', filterConsultant='', filterTipo='';
+let sortBy='horas', sortDir='desc';
+let filterStatus=new Set(), filterTipo=new Set(), filterVincSt=new Set();
+let filterConsultant='', filterResumen='';
 let filterPeriod='', filterDateFrom='', filterDateTo='';
 let expanded=new Set();
 
@@ -517,6 +531,12 @@ function ftCat(status) {
   if (/curso|progress|revis|desarroll|prueba/i.test(status)) return 'inprog';
   return 'todo';
 }
+function vincStColor(key) {
+  const d = dark();
+  if (key==='done')   return d ? {fg:'#32BC72',bg:'#0A271E'} : {fg:'#1A9A5A',bg:'#DDF5EB'};
+  if (key==='inprog') return d ? {fg:'#2E90E0',bg:'#0F2040'} : {fg:'#0278D2',bg:'#DCF0FF'};
+  return                d ? {fg:'#8A97AF',bg:'#1A2438'} : {fg:'#7A90A4',bg:'#EDF1F6'};
+}
 function vincCounts(c) {
   const st = c.linkedStatuses || {};
   let done=0, inprog=0, todo=0;
@@ -555,12 +575,23 @@ function periodToDateRange(p) {
 }
 
 /* ── FILTER LOGIC ────────────────────────────────── */
-function anyFilter() { return !!(filterStatus||filterConsultant||filterTipo||filterDateFrom||filterDateTo); }
+function anyFilter() {
+  return filterStatus.size>0 || filterTipo.size>0 || filterVincSt.size>0 ||
+    !!filterConsultant || !!filterResumen || !!filterDateFrom || !!filterDateTo;
+}
 
 function getFiltered() {
   return getSorted().filter(c=>{
-    if(filterStatus && c.status!==filterStatus) return false;
-    if(filterTipo   && c.tipoActividad!==filterTipo) return false;
+    if(filterStatus.size && !filterStatus.has(c.status)) return false;
+    if(filterTipo.size   && !filterTipo.has(c.tipoActividad)) return false;
+    if(filterVincSt.size) {
+      const vc = vincCounts(c);
+      if(![...filterVincSt].some(k=>vc[k]>0)) return false;
+    }
+    if(filterResumen) {
+      const q = filterResumen.toLowerCase();
+      if(!(c.summary||'').toLowerCase().includes(q) && !(c.key||'').toLowerCase().includes(q)) return false;
+    }
     if(filterConsultant) {
       const entries = getWorklogs(c.key);
       if(!entries.some(e=>e.consultant===filterConsultant)) return false;
@@ -577,7 +608,6 @@ function sortVal(c, col) {
     case 'est':     return (c.estimacionTotal===''||c.estimacionTotal==null) ? null : Number(c.estimacionTotal);
     case 'horas':   return sumHours(getWorklogs(c.key));
     case 'diff':    return estDiff(c);
-    case 'vinc':    return c.linkedCount || 0;
     case 'vincst':  { const v=vincCounts(c); return v.todo+v.inprog; }
     default:        return 0;
   }
@@ -647,14 +677,14 @@ function renderFilters() {
   const stEl=document.getElementById('status-filters');
   stEl.innerHTML='';
   const allSt=document.createElement('button');
-  allSt.className='fpill'+(filterStatus===''?' active':'');
+  allSt.className='fpill'+(filterStatus.size===0?' active':'');
   allSt.dataset.status='';
   allSt.textContent=`Todos (${CASES.length})`;
   stEl.appendChild(allSt);
   Object.entries(stCounts).sort((a,b)=>b[1]-a[1]).forEach(([st,ct])=>{
     const s=sc(st);
     const btn=document.createElement('button');
-    btn.className='fpill st-pill'+(filterStatus===st?' active':'');
+    btn.className='fpill st-pill'+(filterStatus.has(st)?' active':'');
     btn.dataset.status=st;
     btn.style.setProperty('--st-fg',s.fg);
     btn.style.setProperty('--st-bg',s.bg);
@@ -671,14 +701,14 @@ function renderFilters() {
   const taEl=document.getElementById('ta-filters');
   taEl.innerHTML='';
   const allTa=document.createElement('button');
-  allTa.className='fpill'+(filterTipo===''?' active':'');
+  allTa.className='fpill'+(filterTipo.size===0?' active':'');
   allTa.dataset.tipo='';
   allTa.textContent='Todos';
   taEl.appendChild(allTa);
   Object.entries(taCounts).sort((a,b)=>b[1]-a[1]).forEach(([tp,ct])=>{
     const t=tc(tp);
     const btn=document.createElement('button');
-    btn.className='fpill ta-pill'+(filterTipo===tp?' active':'');
+    btn.className='fpill ta-pill'+(filterTipo.has(tp)?' active':'');
     btn.dataset.tipo=tp;
     btn.style.setProperty('--ta-fg',t.fg);
     btn.style.setProperty('--ta-bg',t.bg);
@@ -689,6 +719,33 @@ function renderFilters() {
     const b=e.target.closest('.fpill'); if(!b) return;
     setTipoFilter(b.dataset.tipo);
   };
+
+  const VINCST_DEFS=[['todo','Por hacer'],['inprog','En progreso'],['done','Finalizada']];
+  const vsEl=document.getElementById('vincst-filters');
+  vsEl.innerHTML='';
+  const allVs=document.createElement('button');
+  allVs.className='fpill'+(filterVincSt.size===0?' active':'');
+  allVs.dataset.vincst='';
+  allVs.textContent='Todos';
+  vsEl.appendChild(allVs);
+  VINCST_DEFS.forEach(([key,label])=>{
+    const ct = CASES.filter(c=>vincCounts(c)[key]>0).length;
+    const col = vincStColor(key);
+    const btn=document.createElement('button');
+    btn.className='fpill st-pill'+(filterVincSt.has(key)?' active':'');
+    btn.dataset.vincst=key;
+    btn.style.setProperty('--st-fg',col.fg);
+    btn.style.setProperty('--st-bg',col.bg);
+    btn.textContent=`${label} (${ct})`;
+    vsEl.appendChild(btn);
+  });
+  vsEl.onclick=e=>{
+    const b=e.target.closest('.fpill'); if(!b) return;
+    setVincStFilter(b.dataset.vincst);
+  };
+
+  const rf=document.getElementById('resumen-filter');
+  if(rf.value!==filterResumen) rf.value=filterResumen;
 
   const sel=document.getElementById('consultant-filter');
   const totals={};
@@ -718,15 +775,24 @@ function renderFilters() {
 }
 
 function setStatusFilter(s) {
-  filterStatus=s;
-  document.querySelectorAll('#status-filters .fpill').forEach(b=>b.classList.toggle('active',b.dataset.status===s));
+  if (s==='') filterStatus.clear();
+  else if (filterStatus.has(s)) filterStatus.delete(s);
+  else filterStatus.add(s);
   update();
 }
 function setTipoFilter(t) {
-  filterTipo=t;
-  document.querySelectorAll('#ta-filters .fpill').forEach(b=>b.classList.toggle('active',b.dataset.tipo===t));
+  if (t==='') filterTipo.clear();
+  else if (filterTipo.has(t)) filterTipo.delete(t);
+  else filterTipo.add(t);
   update();
 }
+function setVincStFilter(k) {
+  if (k==='') filterVincSt.clear();
+  else if (filterVincSt.has(k)) filterVincSt.delete(k);
+  else filterVincSt.add(k);
+  update();
+}
+function setResumenFilter(v) { filterResumen=v; update(); }
 function setConsultantFilter(v) { filterConsultant=v; update(); }
 function setPeriodFilter(p) {
   filterPeriod=p;
@@ -750,10 +816,12 @@ function setDateRange() {
   dt.className='f-input'+(filterDateTo?' active-date':'');
   update();
 }
-function clearFilters() {
-  filterStatus=''; filterConsultant=''; filterTipo='';
+function clearFilters(fromButton) {
+  filterStatus=new Set(); filterTipo=new Set(); filterVincSt=new Set();
+  filterConsultant=''; filterResumen='';
   filterPeriod=''; filterDateFrom=''; filterDateTo='';
   expanded=new Set();
+  if (fromButton) update();
 }
 
 function updateClearAndCount() {
@@ -810,6 +878,7 @@ function renderCases() {
     const row=document.createElement('div');
     row.className='trow';
     row.innerHTML=`
+      <button class="tog-btn${isOpen?' open':''}" data-key="${c.key}">${isOpen?'▲':'▼'}</button>
       <span class="t-key"><a href="${JIRA}${c.key}" target="_blank" rel="noopener">${c.key}</a></span>
       <span class="t-summ" title="${c.summary}">${c.summary}</span>
       <span><span class="spill" style="background:${s.bg};color:${s.fg}">${s.label}</span></span>
@@ -818,9 +887,7 @@ function renderCases() {
       <span class="${h>0?(pActive?'t-h period-h':'t-h'):'t-zero'}">${h>0?h+'h':'—'}</span>
       <span class="t-hide t-diff" style="color:${semColor}">${diff===null?'—':(diff>0?'+':'')+diff+'h'}</span>
       <div class="t-hide sem-wrap" title="${semaphoreTitle(diff)}"><span class="sem-dot" style="background:${semColor}"></span></div>
-      <span class="t-vc">${c.linkedCount||'—'}</span>
-      <div class="t-hide">${vincBadges(c)}</div>
-      <button class="tog-btn${isOpen?' open':''}" data-key="${c.key}">${isOpen?'▲':'▼'}</button>`;
+      <div class="t-hide">${vincBadges(c)}</div>`;
     body.appendChild(row);
 
     if(isOpen) {
@@ -962,7 +1029,8 @@ function saveState() {
   if (!currentProject) return;
   sessionStorage.setItem(STATE_KEY, JSON.stringify({
     project: currentProject,
-    filterStatus, filterConsultant, filterTipo,
+    filterStatus: [...filterStatus], filterTipo: [...filterTipo], filterVincSt: [...filterVincSt],
+    filterConsultant, filterResumen,
     filterPeriod, filterDateFrom, filterDateTo,
     sortBy, sortDir,
   }));
@@ -973,8 +1041,8 @@ function loadState() {
 }
 
 /* ── COLUMNAS AJUSTABLES ──────────────────────────── */
-const COL_KEYS = ['caso','resumen','estado','tipo','est','horas','diff','prog','vinc','vincst'];
-const DEFAULT_COL_W = { caso:82, resumen:300, estado:148, tipo:88, est:90, horas:78, diff:74, prog:60, vinc:50, vincst:130 };
+const COL_KEYS = ['caso','resumen','estado','tipo','est','horas','diff','prog','vincst'];
+const DEFAULT_COL_W = { caso:82, resumen:300, estado:148, tipo:88, est:90, horas:78, diff:74, prog:60, vincst:130 };
 const COL_W_KEY = 'jtc_col_widths';
 function loadColWidths() {
   try { return JSON.parse(localStorage.getItem(COL_W_KEY) || 'null') || {}; }
@@ -1031,9 +1099,11 @@ document.querySelector('.trow.thd').addEventListener('click', e => {
   const saved = loadState();
   if (saved && saved.project) {
     document.getElementById('project-input').value = saved.project;
-    filterStatus = saved.filterStatus || '';
+    filterStatus = new Set(saved.filterStatus || []);
+    filterTipo = new Set(saved.filterTipo || []);
+    filterVincSt = new Set(saved.filterVincSt || []);
     filterConsultant = saved.filterConsultant || '';
-    filterTipo = saved.filterTipo || '';
+    filterResumen = saved.filterResumen || '';
     filterPeriod = saved.filterPeriod || '';
     filterDateFrom = saved.filterDateFrom || '';
     filterDateTo = saved.filterDateTo || '';
