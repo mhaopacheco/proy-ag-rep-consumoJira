@@ -122,6 +122,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .vb.inprog{background:var(--jtc-blue)}
 .vb.done{background:#1A9A5A}
 .trow:last-child{border-bottom:none}
+.ttotal{border-top:2px solid var(--bd);border-bottom:none;background:var(--sf2);font-weight:800}
+.tt-label{color:var(--t1);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.tt-val{font-variant-numeric:tabular-nums;color:var(--t1)}
 .thd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:4px 0 6px}
 @media(max-width:760px){.trow{grid-template-columns:28px 78px 1fr 140px 65px}.t-hide{display:none}}
 .t-key{font-family:'Courier New','Consolas',monospace;font-weight:700;font-size:11px;color:var(--ac)}
@@ -298,6 +301,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
         <span class="th-cell t-hide center" data-col="vincst"><span class="th-label" data-col="vincst">Estado vinculadas<span class="sort-ind" data-col="vincst"></span></span><span class="col-resizer" data-col="vincst"></span></span>
       </div>
       <div id="cases-body"></div>
+      <div class="trow ttotal" id="cases-totals"></div>
     </div>
   </div>
 
@@ -863,7 +867,10 @@ function renderCases() {
     d.innerHTML=CASES.length===0
       ? '<strong>Sin datos</strong>Busca un proyecto arriba para empezar.'
       : '<strong>Sin resultados</strong>Ajusta los filtros para ver casos.';
-    body.appendChild(d); return;
+    body.appendChild(d);
+    const totalsEl=document.getElementById('cases-totals');
+    if(totalsEl) totalsEl.innerHTML='';
+    return;
   }
 
   filtered.forEach(c=>{
@@ -937,7 +944,41 @@ function renderCases() {
     renderCases();
   };
 
+  renderTotals(filtered);
   animateBars();
+}
+
+function computeTotals(list) {
+  let est=0, hasEst=false, horas=0, diff=0, hasDiff=false;
+  list.forEach(c=>{
+    const h = sumHours(getWorklogs(c.key));
+    horas += h;
+    const e = (c.estimacionTotal===''||c.estimacionTotal==null) ? null : Number(c.estimacionTotal);
+    if (e!==null) { est+=e; hasEst=true; }
+    const d = estDiff(c);
+    if (d!==null) { diff+=d; hasDiff=true; }
+  });
+  return {
+    est: hasEst ? Math.round(est*100)/100 : null,
+    horas: Math.round(horas*100)/100,
+    diff: hasDiff ? Math.round(diff*100)/100 : null,
+  };
+}
+function renderTotals(filtered) {
+  const el = document.getElementById('cases-totals');
+  if (!el) return;
+  const tot = computeTotals(filtered);
+  el.innerHTML = `
+    <span></span>
+    <span class="tt-label">Total</span>
+    <span></span>
+    <span></span>
+    <span class="t-hide"></span>
+    <span class="t-hide tt-val">${tot.est===null?'—':tot.est+'h'}</span>
+    <span class="tt-val">${tot.horas}h</span>
+    <span class="t-hide tt-val" style="color:${semaphoreColor(tot.diff)}">${tot.diff===null?'—':(tot.diff>0?'+':'')+tot.diff+'h'}</span>
+    <span class="t-hide"></span>
+    <span class="t-hide"></span>`;
 }
 
 function fmtDate(d) {
