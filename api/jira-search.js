@@ -10,7 +10,9 @@ function authHeader() {
   return 'Basic ' + Buffer.from(`${email}:${token}`).toString('base64');
 }
 
-async function jiraFetch(path, options = {}) {
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function jiraFetch(path, options = {}, attempt = 0) {
   const res = await fetch(`${JIRA_SITE}${path}`, {
     ...options,
     headers: {
@@ -20,11 +22,32 @@ async function jiraFetch(path, options = {}) {
       ...(options.headers || {}),
     },
   });
+  if (res.status === 429 && attempt < 5) {
+    const retryAfter = parseFloat(res.headers.get('retry-after'));
+    const waitMs = Number.isFinite(retryAfter) ? retryAfter * 1000 : 400 * Math.pow(2, attempt);
+    await sleep(waitMs);
+    return jiraFetch(path, options, attempt + 1);
+  }
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(`Jira API ${res.status}: ${text.slice(0, 300)}`);
   }
   return res.json();
+}
+
+// Ejecuta `fn` sobre `items` con un máximo de `limit` llamadas en vuelo,
+// para no saturar el rate-limit de Jira cuando hay muchas issues/vinculadas.
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let idx = 0;
+  async function worker() {
+    while (idx < items.length) {
+      const cur = idx++;
+      results[cur] = await fn(items[cur], cur);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
 }
 
 let cachedEstimationFieldId;
@@ -114,14 +137,13 @@ module.exports = async (req, res) => {
     const cases = [];
     const worklogData = {};
 
-    await Promise.all(
-      issues.map(async issue => {
+    await mapWithConcurrency(issues, 6, async issue => {
         const key = issue.key;
         const fields = issue.fields;
         const { keys: linkedKeys, statuses: linkedStatuses } = extractLinks(issue);
 
         const ownWl = await getAllWorklogs(key);
-        const linkedWl = await Promise.all(linkedKeys.map(getAllWorklogs));
+        const linkedWl = await mapWithConcurrency(linkedKeys, 4, getAllWorklogs);
         const entries = ownWl.concat(...linkedWl).sort((a, b) => a.date.localeCompare(b.date));
         worklogData[key] = entries;
 
@@ -141,8 +163,7 @@ module.exports = async (req, res) => {
           linkedCount: linkedKeys.length,
           linkedStatuses,
         });
-      })
-    );
+    });
 
     cases.sort((a, b) => b.updated.localeCompare(a.updated));
     res.status(200).json({ project: projectKey, cases, worklogData });
