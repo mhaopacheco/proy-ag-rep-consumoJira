@@ -31,6 +31,9 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
 .period-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,237,0,.15);border:1px solid rgba(255,237,0,.4);border-radius:6px;padding:3px 10px;font-size:11px;color:#FFED00;font-weight:600;margin-left:10px}
 .theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;white-space:nowrap;font-family:inherit}
 .theme-btn:hover{color:#fff;background:rgba(255,255,255,.18)}
+.brand-nav{display:flex;align-items:center;gap:10px}
+.brand-link{color:rgba(255,255,255,.7);font-size:11px;font-weight:600;text-decoration:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;white-space:nowrap}
+.brand-link:hover{color:#fff;background:rgba(255,255,255,.18)}
 
 .wrap{max-width:1320px;margin:0 auto;padding:18px 18px 30px;display:flex;flex-direction:column;gap:12px}
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:18px 20px}
@@ -180,7 +183,10 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
     Jira Live · Consumo de Horas
     <div class="brand-sub">Consulta cualquier proyecto en tiempo real</div>
   </div>
-  <button class="theme-btn" onclick="toggleTheme()">◑ Tema</button>
+  <div class="brand-nav">
+    <a class="brand-link" href="consultor-proyectos.html">Vista por consultor →</a>
+    <button class="theme-btn" onclick="toggleTheme()">◑ Tema</button>
+  </div>
 </div>
 
 <div class="wrap">
@@ -990,10 +996,13 @@ function fmtDate(d) {
 
 /* ── CONSULTANT RANKING ─────────────────────────── */
 function renderRanking() {
-  const filtered=getFiltered();
   const pActive=dateActive();
+  // El ranking siempre parte de todos los casos del proyecto: sólo se
+  // restringe por el rango de fechas/período (getWorklogs), nunca por
+  // los demás filtros (estado, tipo, resumen, consultor...), para que
+  // se vean TODOS los consultores que registraron horas en el período.
   const totals={};
-  filtered.forEach(c=>getWorklogs(c.key).forEach(e=>{totals[e.consultant]=(totals[e.consultant]||0)+e.hours;}));
+  CASES.forEach(c=>getWorklogs(c.key).forEach(e=>{totals[e.consultant]=(totals[e.consultant]||0)+e.hours;}));
   const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
   const maxH=sorted[0]?.[1]||1;
   const title=document.getElementById('ranking-title');

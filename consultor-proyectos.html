@@ -1,0 +1,689 @@
+<title>Horas por Consultor y Proyecto — JTC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --jtc-navy:#11273C;--jtc-blue:#0278D2;--jtc-org:#FC5E32;--jtc-yel:#FFED00;
+  --bg:#EEF3F9;--sf:#FFFFFF;--sf2:#F5F8FC;--bd:#C8D4E0;
+  --ac:#0278D2;--ac-s:#DCF0FF;
+  --t1:#11273C;--t2:#3D5568;--t3:#7A90A4;
+  --sh:0 1px 4px rgba(17,39,60,.08);--r:10px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;
+  --ac:#2E90E0;--ac-s:#0F2040;--t1:#E0EAF6;--t2:#8095B0;--t3:#506070;
+  --sh:0 1px 4px rgba(0,0,0,.35);
+}}
+:root[data-theme=light]{--bg:#EEF3F9;--sf:#FFF;--sf2:#F5F8FC;--bd:#C8D4E0;--ac:#0278D2;--ac-s:#DCF0FF;--t1:#11273C;--t2:#3D5568;--t3:#7A90A4;--sh:0 1px 4px rgba(17,39,60,.08);}
+:root[data-theme=dark]{--bg:#070F18;--sf:#11273C;--sf2:#1A3050;--bd:#243D56;--ac:#2E90E0;--ac-s:#0F2040;--t1:#E0EAF6;--t2:#8095B0;--t3:#506070;--sh:0 1px 4px rgba(0,0,0,.35);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5}
+
+.brand-hdr{background:var(--jtc-navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand-logo{display:flex;align-items:baseline;gap:8px}
+.brand-jtc{color:#FFF;font-size:22px;font-weight:800;letter-spacing:.08em}
+.brand-tag{color:rgba(255,255,255,.55);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em}
+.brand-title{color:rgba(255,255,255,.9);font-size:14px;font-weight:500;border-left:1px solid rgba(255,255,255,.2);padding-left:16px}
+.brand-sub{color:rgba(255,255,255,.45);font-size:11px;margin-top:2px}
+.brand-nav{display:flex;align-items:center;gap:10px}
+.brand-link{color:rgba(255,255,255,.7);font-size:11px;font-weight:600;text-decoration:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;white-space:nowrap}
+.brand-link:hover{color:#fff;background:rgba(255,255,255,.18)}
+.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.7);cursor:pointer;white-space:nowrap;font-family:inherit}
+.theme-btn:hover{color:#fff;background:rgba(255,255,255,.18)}
+
+.wrap{max-width:1320px;margin:0 auto;padding:18px 18px 30px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:18px 20px}
+.sect-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:12px}
+
+.search-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.search-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:relative}
+.search-box{flex:1;min-width:220px;position:relative}
+.search-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:9px 14px;font-size:14px;color:var(--t1);font-family:'Courier New',monospace;font-weight:700;letter-spacing:.03em;outline:none}
+.search-input:focus{border-color:var(--ac)}
+.search-input::placeholder{font-family:inherit;font-weight:400;color:var(--t3)}
+.search-dd{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:8px;box-shadow:0 4px 16px rgba(17,39,60,.15);max-height:280px;overflow-y:auto;z-index:20;display:none}
+.search-dd.open{display:block}
+.search-dd-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--t1)}
+.search-dd-item:hover,.search-dd-item.hi{background:var(--ac-s)}
+.search-dd-key{font-family:'Courier New',monospace;font-weight:700;color:var(--ac);min-width:70px}
+.search-dd-name{color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-dd-empty{padding:10px 14px;font-size:12px;color:var(--t3)}
+.search-btn{background:var(--jtc-blue);border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap}
+.search-btn:hover{background:#0263AD}
+.search-btn:disabled{opacity:.6;cursor:default}
+.search-status{font-size:12px;color:var(--t3)}
+.search-status.err{color:#D94520;font-weight:600}
+.search-status.ok{color:#1A9A5A;font-weight:600}
+.proj-chips{display:flex;flex-wrap:wrap;gap:6px}
+.proj-chip{display:inline-flex;align-items:center;gap:4px;background:var(--ac-s);color:var(--ac);border-radius:999px;padding:4px 6px 4px 12px;font-size:12px;font-weight:700;font-family:'Courier New',monospace}
+.proj-chip button{background:none;border:none;color:inherit;cursor:pointer;font-size:13px;line-height:1;padding:3px 6px;border-radius:50%;font-family:inherit}
+.proj-chip button:hover{background:rgba(2,120,210,.18)}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:580px){.kpi-grid{grid-template-columns:1fr 1fr}}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:16px 18px}
+.kpi-n{font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;color:var(--jtc-blue)}
+.kpi-n.dim{font-size:26px;color:var(--t1)}
+.kpi-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-top:5px}
+.kpi-sub{font-size:11px;color:var(--t3);margin-top:3px}
+.kpi-accent{border-top:3px solid var(--jtc-blue)}
+.kpi-period{border-top:3px solid var(--jtc-org)}
+
+.filter-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:14px 20px;display:flex;flex-direction:column;gap:14px}
+.filter-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.f-section{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.f-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)}
+.fpills{display:flex;flex-wrap:wrap;gap:5px}
+.fpill{background:var(--sf2);border:1px solid var(--bd);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
+.fpill:hover{border-color:var(--ac);color:var(--ac)}
+.fpill.active{background:var(--ac-s);border-color:var(--ac);color:var(--ac)}
+.fpill.active.st-pill{background:var(--st-bg,var(--ac-s));border-color:var(--st-fg,var(--ac));color:var(--st-fg,var(--ac))}
+.f-input{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--t1);font-family:inherit;width:136px;cursor:pointer;outline:none}
+.f-input:focus{border-color:var(--ac)}
+.f-input.active-date{border-color:var(--jtc-org);background:rgba(252,94,50,.06)}
+.f-select{background:var(--sf);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--t1);font-family:inherit;min-width:180px;cursor:pointer;outline:none}
+.date-pair{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.date-sep{font-size:11px;color:var(--t3)}
+.f-right{display:flex;flex-direction:column;justify-content:flex-end;gap:6px;align-items:flex-end;flex-shrink:0}
+.clear-btn{background:var(--jtc-org);border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;display:none;font-family:inherit;white-space:nowrap}
+.clear-btn:hover{background:#D94520}
+.match-info{font-size:11px;color:var(--t3);text-align:right;white-space:nowrap}
+.match-highlight{font-weight:700;color:var(--jtc-org)}
+.period-note{font-size:10px;color:var(--jtc-org);font-weight:600;text-align:right;white-space:nowrap}
+
+.sort-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between}
+.sort-lbl{font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.02em}
+.tbl-count{font-size:11px;color:var(--t3)}
+.tbl-wrap{overflow-x:auto}
+.trow{display:grid;grid-template-columns:30px 76px 96px 1fr 148px 90px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.trow:last-child{border-bottom:none}
+.thd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:4px 0 6px}
+@media(max-width:760px){.trow{grid-template-columns:28px 76px 1fr 90px}.t-hide{display:none}}
+.t-key{font-family:'Courier New','Consolas',monospace;font-weight:700;font-size:11px;color:var(--ac)}
+.t-key a{color:inherit;text-decoration:none}
+.t-key a:hover{text-decoration:underline}
+.t-proj{font-family:'Courier New','Consolas',monospace;font-weight:700;font-size:10px;color:var(--t2);background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:2px 6px;display:inline-block;white-space:nowrap}
+.t-summ{color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-h{font-weight:700;font-variant-numeric:tabular-nums;color:var(--t1);text-align:right}
+.t-h.period-h{color:var(--jtc-org)}
+.t-zero{color:var(--t3);text-align:right}
+.tog-btn{background:none;border:1px solid var(--bd);border-radius:5px;width:25px;height:22px;cursor:pointer;color:var(--t3);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
+.tog-btn:hover{color:var(--t1);border-color:var(--t2)}
+.tog-btn.open{background:var(--ac-s);border-color:var(--ac);color:var(--ac)}
+.ttotal{border-top:2px solid var(--bd);border-bottom:none;background:var(--sf2);font-weight:800}
+.tt-label{color:var(--t1);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.tt-val{font-variant-numeric:tabular-nums;color:var(--t1);text-align:right}
+
+.exp-row{padding:12px 4px 16px 106px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.exp-meta{font-size:11px;color:var(--t3);margin-bottom:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.exp-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:8px}
+.cons-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.cons-name{width:220px;color:var(--t1);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.cons-bar{flex:1;height:6px;background:var(--sf);border-radius:3px;overflow:hidden;border:1px solid var(--bd)}
+.cons-fill{height:100%;border-radius:3px;background:var(--ac);width:0;transition:width .8s cubic-bezier(.4,0,.2,1) .05s}
+.cons-h{width:44px;font-variant-numeric:tabular-nums;font-weight:700;font-size:11px;color:var(--t2);text-align:right;flex-shrink:0}
+.detail-link{font-size:11px;font-weight:600;color:var(--ac);text-decoration:none;white-space:nowrap}
+.detail-link:hover{text-decoration:underline}
+
+.spill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.spill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+.empty-state{padding:32px;text-align:center;color:var(--t3);font-size:14px}
+.empty-state strong{display:block;font-size:18px;margin-bottom:6px;color:var(--t2)}
+</style>
+
+<!-- BRAND HEADER -->
+<div class="brand-hdr">
+  <div class="brand-logo">
+    <span class="brand-jtc">JTC</span>
+    <span class="brand-tag">just time consulting group</span>
+  </div>
+  <div class="brand-title">
+    Horas por Consultor y Proyecto
+    <div class="brand-sub">Filtra por consultor(es) y proyecto(s) — detalle de horas por caso</div>
+  </div>
+  <div class="brand-nav">
+    <a class="brand-link" href="live.html">← Vista por proyecto</a>
+    <button class="theme-btn" onclick="toggleTheme()">◑ Tema</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- SEARCH -->
+  <div class="search-card">
+    <div class="search-row">
+      <div class="search-box">
+        <input class="search-input" id="project-input" placeholder="Agrega uno o varios proyectos (ej: ATIHD, ATIFT)…" autocomplete="off" spellcheck="false">
+        <div class="search-dd" id="search-dd"></div>
+      </div>
+      <button class="search-btn" id="search-btn" onclick="runSearch()">Buscar</button>
+    </div>
+    <div class="proj-chips" id="proj-chips"></div>
+    <div class="search-status" id="search-status"></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi kpi-accent" id="kpi-h-card">
+      <div class="kpi-n" id="kpi-h">—</div>
+      <div class="kpi-l" id="kpi-h-label">Horas</div>
+      <div class="kpi-sub" id="kpi-h-sub">agrega proyectos y busca</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n dim" id="kpi-casos">—</div>
+      <div class="kpi-l">Casos</div>
+      <div class="kpi-sub" id="kpi-casos-sub">con horas de los consultores filtrados</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n dim" id="kpi-c">—</div>
+      <div class="kpi-l">Consultores</div>
+      <div class="kpi-sub" id="kpi-c-sub">seleccionados / con horas</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n dim" id="kpi-p">—</div>
+      <div class="kpi-l">Proyectos</div>
+      <div class="kpi-sub" id="kpi-p-sub">consultados</div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-card">
+    <div class="filter-row">
+      <div class="f-section" style="flex:1;min-width:220px">
+        <div class="f-label">Resumen</div>
+        <input type="text" class="f-input" style="width:100%" id="resumen-filter" placeholder="Buscar por caso o texto del resumen…" oninput="setResumenFilter(this.value)">
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="f-section" style="flex:1;min-width:260px">
+        <div class="f-label">Consultor (uno o varios)</div>
+        <div class="fpills" id="consultant-filters"></div>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="f-section" style="flex:1;min-width:260px">
+        <div class="f-label">Estado (uno o varios)</div>
+        <div class="fpills" id="status-filters"></div>
+      </div>
+    </div>
+    <div class="filter-row" style="align-items:flex-end">
+      <div class="f-section" style="max-width:210px">
+        <div class="f-label">Período (horas cargadas)</div>
+        <select class="f-select" id="period-filter" onchange="setPeriodFilter(this.value)">
+          <option value="">Todos los períodos</option>
+        </select>
+      </div>
+      <div class="f-section" style="max-width:320px">
+        <div class="f-label">Rango de fechas (worklogs)</div>
+        <div class="date-pair">
+          <input type="date" class="f-input" id="date-from" onchange="setDateRange()">
+          <span class="date-sep">—</span>
+          <input type="date" class="f-input" id="date-to" onchange="setDateRange()">
+        </div>
+      </div>
+      <div class="f-right">
+        <button class="clear-btn" id="clear-btn" onclick="clearFilters(true)">✕ Limpiar filtros</button>
+        <div class="match-info" id="match-info"></div>
+        <div class="period-note" id="period-note" style="display:none">Horas filtradas por fecha de carga</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASES TABLE -->
+  <div class="card">
+    <div class="sort-row">
+      <span class="sort-lbl">Detalle de horas por caso</span>
+      <span class="tbl-count" id="tbl-count"></span>
+    </div>
+    <div class="tbl-wrap">
+      <div class="trow thd">
+        <span></span>
+        <span>Proyecto</span>
+        <span>Caso</span>
+        <span>Resumen</span>
+        <span>Estado</span>
+        <span id="col-h-label" style="text-align:right">Horas</span>
+      </div>
+      <div id="cases-body"></div>
+      <div class="trow ttotal" id="cases-totals"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const JIRA = 'https://justtimeconsulting.atlassian.net/browse/';
+const STATUS_COLORS = [
+  {lc:'#A86500',dc:'#D4940A',bgl:'#FFF3DC',bgd:'#2A1E00'},
+  {lc:'#0B7A7A',dc:'#15AAAA',bgl:'#DCF5F5',bgd:'#002A2A'},
+  {lc:'#1A9A5A',dc:'#32BC72',bgl:'#DDF5EB',bgd:'#002A1A'},
+  {lc:'#7A3CBF',dc:'#A060E8',bgl:'#F0E8FB',bgd:'#1A0A30'},
+  {lc:'#C24E18',dc:'#F07848',bgl:'#FDE8DC',bgd:'#2A0E00'},
+  {lc:'#0278D2',dc:'#2E90E0',bgl:'#DCF0FF',bgd:'#021A30'},
+];
+const statusColorCache = {};
+function colorFor(name, cache, palette) {
+  if (!name) return {lc:'#8A97AF',dc:'#8A97AF',bgl:'#EDF1F6',bgd:'#1A2438'};
+  if (!cache[name]) cache[name] = palette[Object.keys(cache).length % palette.length];
+  return cache[name];
+}
+function dark() {
+  const t=document.documentElement.getAttribute('data-theme');
+  return t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+}
+function sc(status) {
+  const cfg=colorFor(status, statusColorCache, STATUS_COLORS);
+  return dark()?{fg:cfg.dc,bg:cfg.bgd,label:status}:{fg:cfg.lc,bg:cfg.bgl,label:status};
+}
+function toggleTheme() { document.documentElement.setAttribute('data-theme',dark()?'light':'dark'); renderAll(); }
+
+/* ── STATE ─────────────────────────────────────────── */
+let PROJECTS = [];
+let CASES = [];
+let WORKLOG_DATA = {};
+let filterConsultants = new Set(), filterStatus = new Set();
+let filterResumen = '', filterPeriod = '', filterDateFrom = '', filterDateTo = '';
+let expanded = new Set();
+
+/* ── PROJECT AUTOCOMPLETE + CHIPS ─────────────────── */
+const projectInput = document.getElementById('project-input');
+const searchDD = document.getElementById('search-dd');
+let ddItems = [], ddHi = -1, ddDebounce = null, ddSeq = 0;
+
+async function fetchProjectSuggestions(q) {
+  const seq = ++ddSeq;
+  try {
+    const res = await fetch(`/api/jira-projects?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if (seq !== ddSeq) return;
+    if (!res.ok) { closeDD(); return; }
+    renderDD((data.projects||[]).filter(p=>!PROJECTS.includes(p.key)));
+  } catch { if (seq===ddSeq) closeDD(); }
+}
+function renderDD(projects) {
+  ddItems = projects; ddHi = -1;
+  searchDD.innerHTML = projects.length===0
+    ? '<div class="search-dd-empty">Sin coincidencias</div>'
+    : projects.map((p,i)=>`<div class="search-dd-item" data-i="${i}"><span class="search-dd-key">${p.key}</span><span class="search-dd-name">${p.name}</span></div>`).join('');
+  searchDD.classList.add('open');
+}
+function closeDD() { searchDD.classList.remove('open'); searchDD.innerHTML=''; ddItems=[]; ddHi=-1; }
+function highlightDD() { searchDD.querySelectorAll('.search-dd-item').forEach((el,i)=>el.classList.toggle('hi', i===ddHi)); }
+function addProjectChip(key) {
+  key = String(key||'').trim().toUpperCase();
+  if (!key || PROJECTS.includes(key)) return;
+  PROJECTS.push(key);
+  renderProjectChips();
+}
+function removeProjectChip(key) {
+  PROJECTS = PROJECTS.filter(p=>p!==key);
+  renderProjectChips();
+}
+function renderProjectChips() {
+  document.getElementById('proj-chips').innerHTML = PROJECTS.map(k=>
+    `<span class="proj-chip">${k}<button type="button" data-k="${k}" title="Quitar">✕</button></span>`
+  ).join('');
+  document.querySelectorAll('.proj-chip button').forEach(b=>{
+    b.onclick = () => removeProjectChip(b.dataset.k);
+  });
+}
+projectInput.addEventListener('input', () => {
+  const q = projectInput.value.trim();
+  clearTimeout(ddDebounce);
+  if (!q) { closeDD(); return; }
+  ddDebounce = setTimeout(()=>fetchProjectSuggestions(q), 250);
+});
+document.addEventListener('click', e => { if (!e.target.closest('.search-box')) closeDD(); });
+searchDD.addEventListener('click', e => {
+  const item = e.target.closest('.search-dd-item'); if (!item) return;
+  const p = ddItems[parseInt(item.dataset.i,10)];
+  if (p) { addProjectChip(p.key); projectInput.value=''; closeDD(); projectInput.focus(); }
+});
+projectInput.addEventListener('keydown', e => {
+  const open = searchDD.classList.contains('open') && ddItems.length>0;
+  if (e.key==='ArrowDown' && open) { e.preventDefault(); ddHi=Math.min(ddHi+1, ddItems.length-1); highlightDD(); }
+  else if (e.key==='ArrowUp' && open) { e.preventDefault(); ddHi=Math.max(ddHi-1,0); highlightDD(); }
+  else if (e.key==='Enter') {
+    if (open && ddHi>=0) { addProjectChip(ddItems[ddHi].key); projectInput.value=''; closeDD(); }
+    else if (projectInput.value.trim()) { addProjectChip(projectInput.value); projectInput.value=''; closeDD(); }
+  } else if (e.key==='Escape') { closeDD(); }
+});
+
+/* ── SEARCH (fetch múltiples proyectos en paralelo) ── */
+async function runSearch() {
+  const btn = document.getElementById('search-btn');
+  const status = document.getElementById('search-status');
+  if (PROJECTS.length===0) { status.className='search-status err'; status.textContent='Agrega al menos un proyecto.'; return; }
+
+  btn.disabled = true;
+  status.className = 'search-status';
+  status.textContent = 'Consultando Jira en vivo…';
+
+  try {
+    const results = await Promise.all(PROJECTS.map(async key => {
+      const res = await fetch(`/api/jira-search?project=${encodeURIComponent(key)}`);
+      const data = await res.json();
+      return { key, ok: res.ok, data };
+    }));
+
+    const errors = [];
+    const cases = []; const worklogData = {};
+    results.forEach(({key, ok, data}) => {
+      if (!ok) { errors.push(`${key}: ${data.error||'error desconocido'}`); return; }
+      (data.cases||[]).forEach(c => cases.push({ ...c, project:key }));
+      Object.assign(worklogData, data.worklogData||{});
+    });
+
+    CASES = cases;
+    WORKLOG_DATA = worklogData;
+    Object.keys(statusColorCache).forEach(k=>delete statusColorCache[k]);
+
+    clearFilters();
+    status.className = errors.length ? 'search-status err' : 'search-status ok';
+    status.textContent = errors.length
+      ? `${cases.length} caso(s) cargados. Errores: ${errors.join(' · ')}`
+      : `${cases.length} caso(s) cargados de ${PROJECTS.join(', ')}.`;
+    renderAll();
+  } catch (err) {
+    status.className = 'search-status err';
+    status.textContent = 'Error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ── WORKLOG HELPERS ─────────────────────────────── */
+function getWorklogs(key) {
+  const entries = WORKLOG_DATA[key] || [];
+  if (!filterDateFrom && !filterDateTo) return entries;
+  return entries.filter(e => {
+    if (filterDateFrom && e.date < filterDateFrom) return false;
+    if (filterDateTo   && e.date > filterDateTo)   return false;
+    return true;
+  });
+}
+function getScopedEntries(key) {
+  const entries = getWorklogs(key);
+  if (filterConsultants.size===0) return entries;
+  return entries.filter(e => filterConsultants.has(e.consultant));
+}
+function sumHours(entries) { return Math.round(entries.reduce((s,e)=>s+e.hours,0)*100)/100; }
+function byConsultant(entries) {
+  const t={};
+  entries.forEach(e=>{ t[e.consultant]=(t[e.consultant]||0)+e.hours; });
+  return Object.entries(t).sort((a,b)=>b[1]-a[1]).map(([name,hours])=>({name,hours:Math.round(hours*100)/100}));
+}
+function dateActive() { return !!(filterDateFrom||filterDateTo); }
+
+/* ── PERIODS ─────────────────────────────────────── */
+function getAvailablePeriods() {
+  const months=new Set();
+  Object.values(WORKLOG_DATA).forEach(es=>es.forEach(e=>months.add(e.date.substring(0,7))));
+  return [...months].sort().reverse();
+}
+function periodLabel(p) {
+  const [y,m]=p.split('-');
+  const ns=['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${ns[parseInt(m)]} ${y}`;
+}
+function periodToDateRange(p) {
+  const [y,m]=p.split('-').map(Number);
+  const from=`${y}-${String(m).padStart(2,'0')}-01`;
+  const last=new Date(y,m,0).getDate();
+  return {from, to:`${y}-${String(m).padStart(2,'0')}-${last}`};
+}
+
+/* ── FILTER LOGIC ────────────────────────────────── */
+function anyFilter() {
+  return filterConsultants.size>0 || filterStatus.size>0 || !!filterResumen || !!filterDateFrom || !!filterDateTo;
+}
+function getFiltered() {
+  const list = CASES.filter(c=>{
+    if (filterStatus.size && !filterStatus.has(c.status)) return false;
+    if (filterResumen) {
+      const q = filterResumen.toLowerCase();
+      if (!(c.summary||'').toLowerCase().includes(q) && !(c.key||'').toLowerCase().includes(q)) return false;
+    }
+    if (filterConsultants.size) {
+      if (getScopedEntries(c.key).length===0) return false;
+    }
+    return true;
+  });
+  return list.sort((a,b)=>sumHours(getScopedEntries(b.key))-sumHours(getScopedEntries(a.key)));
+}
+
+/* ── FILTER UI ───────────────────────────────────── */
+function renderFilters() {
+  const consTotals={};
+  CASES.forEach(c=>getWorklogs(c.key).forEach(e=>{consTotals[e.consultant]=(consTotals[e.consultant]||0)+e.hours;}));
+  const cEl=document.getElementById('consultant-filters');
+  cEl.innerHTML='';
+  const allC=document.createElement('button');
+  allC.className='fpill'+(filterConsultants.size===0?' active':'');
+  allC.dataset.c='';
+  allC.textContent=`Todos (${Object.keys(consTotals).length})`;
+  cEl.appendChild(allC);
+  Object.entries(consTotals).sort((a,b)=>b[1]-a[1]).forEach(([name,h])=>{
+    const btn=document.createElement('button');
+    btn.className='fpill'+(filterConsultants.has(name)?' active':'');
+    btn.dataset.c=name;
+    btn.textContent=`${name} (${h.toFixed(1)}h)`;
+    cEl.appendChild(btn);
+  });
+  cEl.onclick=e=>{ const b=e.target.closest('.fpill'); if(!b) return; setConsultantFilter(b.dataset.c); };
+
+  const stCounts={};
+  CASES.forEach(c=>{stCounts[c.status]=(stCounts[c.status]||0)+1;});
+  const stEl=document.getElementById('status-filters');
+  stEl.innerHTML='';
+  const allSt=document.createElement('button');
+  allSt.className='fpill'+(filterStatus.size===0?' active':'');
+  allSt.dataset.status='';
+  allSt.textContent=`Todos (${CASES.length})`;
+  stEl.appendChild(allSt);
+  Object.entries(stCounts).sort((a,b)=>b[1]-a[1]).forEach(([st,ct])=>{
+    const s=sc(st);
+    const btn=document.createElement('button');
+    btn.className='fpill st-pill'+(filterStatus.has(st)?' active':'');
+    btn.dataset.status=st;
+    btn.style.setProperty('--st-fg',s.fg);
+    btn.style.setProperty('--st-bg',s.bg);
+    btn.textContent=`${s.label} (${ct})`;
+    stEl.appendChild(btn);
+  });
+  stEl.onclick=e=>{ const b=e.target.closest('.fpill'); if(!b) return; setStatusFilter(b.dataset.status); };
+
+  const pSel=document.getElementById('period-filter');
+  pSel.innerHTML='<option value="">Todos los períodos</option>';
+  getAvailablePeriods().forEach(p=>{
+    const o=document.createElement('option');
+    o.value=p; o.textContent=periodLabel(p);
+    if(p===filterPeriod) o.selected=true;
+    pSel.appendChild(o);
+  });
+
+  const df=document.getElementById('date-from');
+  const dt=document.getElementById('date-to');
+  df.value=filterDateFrom; dt.value=filterDateTo;
+  df.className='f-input'+(filterDateFrom?' active-date':'');
+  dt.className='f-input'+(filterDateTo?' active-date':'');
+
+  const rf=document.getElementById('resumen-filter');
+  if (rf.value!==filterResumen) rf.value=filterResumen;
+}
+
+function setConsultantFilter(name) {
+  if (name==='') filterConsultants.clear();
+  else if (filterConsultants.has(name)) filterConsultants.delete(name);
+  else filterConsultants.add(name);
+  update();
+}
+function setStatusFilter(s) {
+  if (s==='') filterStatus.clear();
+  else if (filterStatus.has(s)) filterStatus.delete(s);
+  else filterStatus.add(s);
+  update();
+}
+function setResumenFilter(v) { filterResumen=v; update(); }
+function setPeriodFilter(p) {
+  filterPeriod=p;
+  if(p) { const {from,to}=periodToDateRange(p); filterDateFrom=from; filterDateTo=to; }
+  else  { filterDateFrom=''; filterDateTo=''; }
+  update();
+}
+function setDateRange() {
+  filterDateFrom=document.getElementById('date-from').value;
+  filterDateTo  =document.getElementById('date-to').value;
+  filterPeriod='';
+  getAvailablePeriods().forEach(p=>{
+    const {from,to}=periodToDateRange(p);
+    if(from===filterDateFrom && to===filterDateTo) filterPeriod=p;
+  });
+  update();
+}
+function clearFilters(fromButton) {
+  filterConsultants=new Set(); filterStatus=new Set(); filterResumen='';
+  filterPeriod=''; filterDateFrom=''; filterDateTo='';
+  expanded=new Set();
+  if (fromButton) update();
+}
+function updateClearAndCount() {
+  document.getElementById('clear-btn').style.display=anyFilter()?'block':'none';
+  const n=getFiltered().length;
+  const info=document.getElementById('match-info');
+  if(anyFilter()&&n<CASES.length) info.innerHTML=`<span class="match-highlight">${n}</span> de ${CASES.length} casos`;
+  else info.textContent='';
+}
+
+/* ── KPIs ────────────────────────────────────────── */
+function updateKPIs() {
+  const f=getFiltered();
+  let total=0;
+  const consNames=new Set();
+  f.forEach(c=>{
+    const entries=getScopedEntries(c.key);
+    total+=sumHours(entries);
+    entries.forEach(e=>consNames.add(e.consultant));
+  });
+  const pActive=dateActive();
+
+  document.getElementById('kpi-h').textContent=total.toFixed(1)+'h';
+  document.getElementById('kpi-h-label').textContent=pActive?'Horas en período':'Horas';
+  document.getElementById('kpi-h-sub').textContent=CASES.length?( (filterConsultants.size?'de consultores filtrados':'de todos los consultores') ):'agrega proyectos y busca';
+  document.getElementById('kpi-h-card').className='kpi'+(pActive?' kpi-period':' kpi-accent');
+  document.getElementById('kpi-casos').textContent=f.length;
+  document.getElementById('kpi-c').textContent=filterConsultants.size||consNames.size;
+  document.getElementById('kpi-c-sub').textContent=filterConsultants.size?'seleccionados':'con horas registradas';
+  document.getElementById('kpi-p').textContent=PROJECTS.length;
+
+  const colH=document.getElementById('col-h-label');
+  if(colH) colH.textContent=pActive?'Horas (período)':'Horas';
+  const pNote=document.getElementById('period-note');
+  if(pNote) pNote.style.display=pActive?'block':'none';
+}
+
+/* ── CASES TABLE ─────────────────────────────────── */
+function renderCases() {
+  const filtered=getFiltered();
+  document.getElementById('tbl-count').textContent=`${filtered.length} caso${filtered.length!==1?'s':''}`;
+  const body=document.getElementById('cases-body');
+  body.innerHTML='';
+  const pActive=dateActive();
+
+  if (filtered.length===0) {
+    const d=document.createElement('div');
+    d.className='empty-state';
+    d.innerHTML = CASES.length===0
+      ? '<strong>Sin datos</strong>Agrega uno o varios proyectos arriba y busca.'
+      : '<strong>Sin resultados</strong>Ajusta los filtros para ver casos.';
+    body.appendChild(d);
+    const totalsEl=document.getElementById('cases-totals');
+    if(totalsEl) totalsEl.innerHTML='';
+    return;
+  }
+
+  filtered.forEach(c=>{
+    const s=sc(c.status);
+    const entries=getScopedEntries(c.key);
+    const h=sumHours(entries);
+    const isOpen=expanded.has(c.key);
+
+    const row=document.createElement('div');
+    row.className='trow';
+    row.innerHTML=`
+      <button class="tog-btn${isOpen?' open':''}" data-key="${c.key}">${isOpen?'▲':'▼'}</button>
+      <span class="t-proj">${c.project}</span>
+      <span class="t-key"><a href="${JIRA}${c.key}" target="_blank" rel="noopener">${c.key}</a></span>
+      <span class="t-summ" title="${c.summary}">${c.summary}</span>
+      <span><span class="spill" style="background:${s.bg};color:${s.fg}">${s.label}</span></span>
+      <span class="${h>0?(pActive?'t-h period-h':'t-h'):'t-zero'}">${h>0?h+'h':'—'}</span>`;
+    body.appendChild(row);
+
+    if (isOpen) {
+      const exp=document.createElement('div');
+      exp.className='exp-row';
+      const byC=byConsultant(entries);
+      exp.innerHTML=`<div class="exp-meta">
+        <span>${filterConsultants.size?'Horas de los consultores filtrados en este caso':'Horas por consultor en este caso'}</span>
+        <a class="detail-link" href="jira-horas-dashboard.html?key=${c.key}">Detalle por consultor/mes →</a>
+      </div>`;
+      if (byC.length>0) {
+        const maxCH=byC[0].hours;
+        exp.innerHTML+=`<div>
+          ${byC.map(bc=>`
+            <div class="cons-item">
+              <span class="cons-name">${bc.name}</span>
+              <div class="cons-bar"><div class="cons-fill" data-w="${(bc.hours/maxCH*100).toFixed(1)}%"></div></div>
+              <span class="cons-h">${bc.hours}h</span>
+            </div>`).join('')}
+        </div>`;
+      } else {
+        exp.innerHTML+='<span style="font-size:12px;color:var(--t3)">Sin horas'+(filterConsultants.size?' de los consultores filtrados':'')+(pActive?' en el período seleccionado':' registradas')+'.</span>';
+      }
+      body.appendChild(exp);
+    }
+  });
+
+  body.onclick=e=>{
+    const btn=e.target.closest('.tog-btn'); if(!btn) return;
+    const k=btn.dataset.key;
+    if(expanded.has(k)) expanded.delete(k); else expanded.add(k);
+    renderCases();
+  };
+
+  renderTotals(filtered);
+  animateBars();
+}
+function renderTotals(filtered) {
+  const el=document.getElementById('cases-totals');
+  if (!el) return;
+  const total = Math.round(filtered.reduce((s,c)=>s+sumHours(getScopedEntries(c.key)),0)*100)/100;
+  el.innerHTML=`
+    <span></span>
+    <span></span>
+    <span class="tt-label">Total</span>
+    <span></span>
+    <span></span>
+    <span class="tt-val">${total}h</span>`;
+}
+function animateBars() {
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('[data-w]').forEach(el=>{
+      setTimeout(()=>{el.style.width=el.dataset.w;},60);
+    });
+  });
+}
+
+/* ── MASTER UPDATE ───────────────────────────────── */
+function update() {
+  updateClearAndCount();
+  updateKPIs();
+  renderFilters();
+  renderCases();
+}
+function renderAll() { update(); }
+
+renderAll();
+</script>
