@@ -238,11 +238,11 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
         <div class="f-label">Resumen</div>
         <input type="text" class="f-input" style="width:100%" id="resumen-filter" placeholder="Buscar por caso o texto del resumen…" oninput="setResumenFilter(this.value)">
       </div>
-      <div class="f-section" style="max-width:260px">
-        <div class="f-label">Consultor</div>
-        <select class="f-select" id="consultant-filter" onchange="setConsultantFilter(this.value)">
-          <option value="">Todos los consultores</option>
-        </select>
+    </div>
+    <div class="filter-row">
+      <div class="f-section" style="flex:1;min-width:260px">
+        <div class="f-label">Consultor (uno o varios) — filtra el consumo de sus vinculadas</div>
+        <div class="fpills" id="consultant-filters"></div>
       </div>
     </div>
     <div class="filter-row">
@@ -276,6 +276,14 @@ body{background:var(--bg);color:var(--t1);font-family:'Inter','Segoe UI',system-
           <input type="date" class="f-input" id="date-from" onchange="setDateRange()">
           <span class="date-sep">—</span>
           <input type="date" class="f-input" id="date-to" onchange="setDateRange()">
+        </div>
+      </div>
+      <div class="f-section" style="max-width:320px">
+        <div class="f-label">Fecha de creación (caso)</div>
+        <div class="date-pair">
+          <input type="date" class="f-input" id="created-from" onchange="setCreatedRange()">
+          <span class="date-sep">—</span>
+          <input type="date" class="f-input" id="created-to" onchange="setCreatedRange()">
         </div>
       </div>
       <div class="f-right">
@@ -346,9 +354,10 @@ const JIRA = 'https://justtimeconsulting.atlassian.net/browse/';
 
 /* ── FILTER STATE ────────────────────────────────── */
 let sortBy='horas', sortDir='desc';
-let filterStatus=new Set(), filterTipo=new Set(), filterVincSt=new Set();
-let filterConsultant='', filterResumen='';
+let filterStatus=new Set(), filterTipo=new Set(), filterVincSt=new Set(), filterConsultants=new Set();
+let filterResumen='';
 let filterPeriod='', filterDateFrom='', filterDateTo='';
+let filterCreatedFrom='', filterCreatedTo='';
 let expanded=new Set();
 
 /* ── SEARCH: autocomplete de proyectos ───────────── */
@@ -501,7 +510,13 @@ function byConsultantIssue(entries) {
   });
   return Object.values(t).sort((a,b)=>b.hours-a.hours).map(x=>({...x,hours:Math.round(x.hours*100)/100}));
 }
+function getScopedEntries(key) {
+  const entries = getWorklogs(key);
+  if (filterConsultants.size===0) return entries;
+  return entries.filter(e=>filterConsultants.has(e.consultant));
+}
 function dateActive() { return !!(filterDateFrom||filterDateTo); }
+function createdActive() { return !!(filterCreatedFrom||filterCreatedTo); }
 
 /* ── COLOR HELPERS ───────────────────────────────── */
 function dark() {
@@ -520,7 +535,7 @@ function tc(tipo) {
 /* ── SEMÁFORO: Estimación Total − Horas ──────────── */
 function estDiff(c) {
   if (c.estimacionTotal === '' || c.estimacionTotal == null) return null;
-  return Math.round((Number(c.estimacionTotal) - sumHours(getWorklogs(c.key))) * 100) / 100;
+  return Math.round((Number(c.estimacionTotal) - sumHours(getScopedEntries(c.key))) * 100) / 100;
 }
 function semaphoreColor(diff) {
   if (diff === null) return dark() ? '#3D5568' : '#C8D4E0';
@@ -586,8 +601,8 @@ function periodToDateRange(p) {
 
 /* ── FILTER LOGIC ────────────────────────────────── */
 function anyFilter() {
-  return filterStatus.size>0 || filterTipo.size>0 || filterVincSt.size>0 ||
-    !!filterConsultant || !!filterResumen || !!filterDateFrom || !!filterDateTo;
+  return filterStatus.size>0 || filterTipo.size>0 || filterVincSt.size>0 || filterConsultants.size>0 ||
+    !!filterResumen || !!filterDateFrom || !!filterDateTo || !!filterCreatedFrom || !!filterCreatedTo;
 }
 
 function getFiltered() {
@@ -602,10 +617,11 @@ function getFiltered() {
       const q = filterResumen.toLowerCase();
       if(!(c.summary||'').toLowerCase().includes(q) && !(c.key||'').toLowerCase().includes(q)) return false;
     }
-    if(filterConsultant) {
-      const entries = getWorklogs(c.key);
-      if(!entries.some(e=>e.consultant===filterConsultant)) return false;
+    if(filterConsultants.size) {
+      if(getScopedEntries(c.key).length===0) return false;
     }
+    if(filterCreatedFrom && c.created < filterCreatedFrom) return false;
+    if(filterCreatedTo   && c.created > filterCreatedTo)   return false;
     return true;
   });
 }
@@ -616,7 +632,7 @@ function sortVal(c, col) {
     case 'estado':  return c.status || '';
     case 'tipo':    return c.tipoActividad || '';
     case 'est':     return (c.estimacionTotal===''||c.estimacionTotal==null) ? null : Number(c.estimacionTotal);
-    case 'horas':   return sumHours(getWorklogs(c.key));
+    case 'horas':   return sumHours(getScopedEntries(c.key));
     case 'diff':    return estDiff(c);
     case 'vincst':  { const v=vincCounts(c); return v.todo+v.inprog; }
     default:        return 0;
@@ -644,7 +660,7 @@ function updateKPIs() {
   const names=new Set();
   let conAct=0;
   f.forEach(c=>{
-    const entries=getWorklogs(c.key);
+    const entries=getScopedEntries(c.key);
     const h=sumHours(entries);
     total+=h;
     if(h>0) conAct++;
@@ -757,16 +773,23 @@ function renderFilters() {
   const rf=document.getElementById('resumen-filter');
   if(rf.value!==filterResumen) rf.value=filterResumen;
 
-  const sel=document.getElementById('consultant-filter');
+  const cEl=document.getElementById('consultant-filters');
   const totals={};
   CASES.forEach(c=>getWorklogs(c.key).forEach(e=>{totals[e.consultant]=(totals[e.consultant]||0)+e.hours;}));
-  sel.innerHTML='<option value="">Todos los consultores</option>';
+  cEl.innerHTML='';
+  const allC=document.createElement('button');
+  allC.className='fpill'+(filterConsultants.size===0?' active':'');
+  allC.dataset.c='';
+  allC.textContent=`Todos (${Object.keys(totals).length})`;
+  cEl.appendChild(allC);
   Object.entries(totals).sort((a,b)=>b[1]-a[1]).forEach(([name,h])=>{
-    const o=document.createElement('option');
-    o.value=name; o.textContent=`${name} (${h.toFixed(1)}h)`;
-    if(name===filterConsultant) o.selected=true;
-    sel.appendChild(o);
+    const btn=document.createElement('button');
+    btn.className='fpill'+(filterConsultants.has(name)?' active':'');
+    btn.dataset.c=name;
+    btn.textContent=`${name} (${h.toFixed(1)}h)`;
+    cEl.appendChild(btn);
   });
+  cEl.onclick=e=>{ const b=e.target.closest('.fpill'); if(!b) return; setConsultantFilter(b.dataset.c); };
 
   const pSel=document.getElementById('period-filter');
   pSel.innerHTML='<option value="">Todos los períodos</option>';
@@ -782,6 +805,12 @@ function renderFilters() {
   df.value=filterDateFrom; dt.value=filterDateTo;
   df.className='f-input'+(filterDateFrom?' active-date':'');
   dt.className='f-input'+(filterDateTo?' active-date':'');
+
+  const cf=document.getElementById('created-from');
+  const ct=document.getElementById('created-to');
+  cf.value=filterCreatedFrom; ct.value=filterCreatedTo;
+  cf.className='f-input'+(filterCreatedFrom?' active-date':'');
+  ct.className='f-input'+(filterCreatedTo?' active-date':'');
 }
 
 function setStatusFilter(s) {
@@ -803,7 +832,12 @@ function setVincStFilter(k) {
   update();
 }
 function setResumenFilter(v) { filterResumen=v; update(); }
-function setConsultantFilter(v) { filterConsultant=v; update(); }
+function setConsultantFilter(name) {
+  if (name==='') filterConsultants.clear();
+  else if (filterConsultants.has(name)) filterConsultants.delete(name);
+  else filterConsultants.add(name);
+  update();
+}
 function setPeriodFilter(p) {
   filterPeriod=p;
   if(p) { const {from,to}=periodToDateRange(p); filterDateFrom=from; filterDateTo=to; }
@@ -826,10 +860,16 @@ function setDateRange() {
   dt.className='f-input'+(filterDateTo?' active-date':'');
   update();
 }
+function setCreatedRange() {
+  filterCreatedFrom=document.getElementById('created-from').value;
+  filterCreatedTo  =document.getElementById('created-to').value;
+  update();
+}
 function clearFilters(fromButton) {
-  filterStatus=new Set(); filterTipo=new Set(); filterVincSt=new Set();
-  filterConsultant=''; filterResumen='';
+  filterStatus=new Set(); filterTipo=new Set(); filterVincSt=new Set(); filterConsultants=new Set();
+  filterResumen='';
   filterPeriod=''; filterDateFrom=''; filterDateTo='';
+  filterCreatedFrom=''; filterCreatedTo='';
   expanded=new Set();
   if (fromButton) update();
 }
@@ -882,7 +922,7 @@ function renderCases() {
   filtered.forEach(c=>{
     const s=sc(c.status);
     const t=tc(c.tipoActividad);
-    const entries=getWorklogs(c.key);
+    const entries=getScopedEntries(c.key);
     const h=sumHours(entries);
     const isOpen=expanded.has(c.key);
     const diff=estDiff(c);
@@ -911,6 +951,7 @@ function renderCases() {
         <span>Actualizado: <strong>${fmtDate(c.updated)}</strong></span>
         ${c.tipoActividad?`<span class="ta-badge" style="background:${t.bg};color:${t.fg}">${c.tipoActividad}</span>`:''}
         ${pActive?`<span style="color:#FC5E32;font-weight:600;font-size:10px">▶ Horas en período: ${h}h</span>`:''}
+        ${filterConsultants.size?`<span style="color:var(--ac);font-weight:600;font-size:10px">▶ Sólo consultores filtrados: ${h}h</span>`:''}
         <a href="jira-horas-dashboard.html?key=${c.key}" style="margin-left:auto;font-size:11px;font-weight:600;color:var(--ac)">Detalle por consultor/mes →</a>
       </div>`;
       if(byC.length>0) {
@@ -957,7 +998,7 @@ function renderCases() {
 function computeTotals(list) {
   let est=0, hasEst=false, horas=0, diff=0, hasDiff=false;
   list.forEach(c=>{
-    const h = sumHours(getWorklogs(c.key));
+    const h = sumHours(getScopedEntries(c.key));
     horas += h;
     const e = (c.estimacionTotal===''||c.estimacionTotal==null) ? null : Number(c.estimacionTotal);
     if (e!==null) { est+=e; hasEst=true; }
@@ -998,15 +1039,16 @@ function fmtDate(d) {
 function renderRanking() {
   const pActive=dateActive();
   // El ranking siempre parte de todos los casos del proyecto: sólo se
-  // restringe por el rango de fechas/período (getWorklogs), nunca por
-  // los demás filtros (estado, tipo, resumen, consultor...), para que
-  // se vean TODOS los consultores que registraron horas en el período.
+  // restringe por el rango de fechas/período y por el filtro de
+  // consultor (ambos elegidos a propósito), nunca por los demás
+  // filtros (estado, tipo, resumen...), para que se vean TODOS los
+  // consultores que registraron horas en el período seleccionado.
   const totals={};
-  CASES.forEach(c=>getWorklogs(c.key).forEach(e=>{totals[e.consultant]=(totals[e.consultant]||0)+e.hours;}));
+  CASES.forEach(c=>getScopedEntries(c.key).forEach(e=>{totals[e.consultant]=(totals[e.consultant]||0)+e.hours;}));
   const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
   const maxH=sorted[0]?.[1]||1;
   const title=document.getElementById('ranking-title');
-  if(title) title.textContent=pActive?'Ranking de consultores (período seleccionado)':'Ranking de consultores';
+  if(title) title.textContent=filterConsultants.size?'Ranking de consultores (filtrados)':(pActive?'Ranking de consultores (período seleccionado)':'Ranking de consultores');
   document.getElementById('ranking').innerHTML=sorted.length?sorted.map(([name,h],i)=>`
     <div class="rc-item rc-rank-${i<1?1:i<3?2:3}">
       <span class="rc-name">${name}</span>
@@ -1080,8 +1122,9 @@ function saveState() {
   sessionStorage.setItem(STATE_KEY, JSON.stringify({
     project: currentProject,
     filterStatus: [...filterStatus], filterTipo: [...filterTipo], filterVincSt: [...filterVincSt],
-    filterConsultant, filterResumen,
+    filterConsultants: [...filterConsultants], filterResumen,
     filterPeriod, filterDateFrom, filterDateTo,
+    filterCreatedFrom, filterCreatedTo,
     sortBy, sortDir,
   }));
 }
@@ -1152,11 +1195,13 @@ document.querySelector('.trow.thd').addEventListener('click', e => {
     filterStatus = new Set(saved.filterStatus || []);
     filterTipo = new Set(saved.filterTipo || []);
     filterVincSt = new Set(saved.filterVincSt || []);
-    filterConsultant = saved.filterConsultant || '';
+    filterConsultants = new Set(saved.filterConsultants || []);
     filterResumen = saved.filterResumen || '';
     filterPeriod = saved.filterPeriod || '';
     filterDateFrom = saved.filterDateFrom || '';
     filterDateTo = saved.filterDateTo || '';
+    filterCreatedFrom = saved.filterCreatedFrom || '';
+    filterCreatedTo = saved.filterCreatedTo || '';
     sortBy = saved.sortBy || 'horas';
     sortDir = saved.sortDir || 'desc';
     runSearch(true);

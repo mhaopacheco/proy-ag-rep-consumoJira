@@ -98,7 +98,9 @@ function extractLinks(issue) {
 
 module.exports = async (req, res) => {
   const projectKey = String(req.query.project || '').trim().toUpperCase();
-  const limit = Math.min(200, Math.max(1, parseInt(req.query.limit, 10) || 50));
+  // Por defecto trae TODOS los casos del proyecto (paginando de a 100);
+  // el tope de 1000 es sólo una salvaguarda ante proyectos enormes.
+  const limit = Math.min(1000, Math.max(1, parseInt(req.query.limit, 10) || 1000));
 
   if (!projectKey) {
     res.status(400).json({ error: 'Falta el parámetro "project"' });
